@@ -10,10 +10,12 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+/vendor/
 
 # Sensitive files
-*.env
-*.env.local
+.env
+.env.local
+.env.production
 config/aws-config.js
 
 # Backups
@@ -22,3 +24,21 @@ server-download-backup/
 
 # Logs
 *.log
+storage/logs/*.log
+
+# Laravel cache
+bootstrap/cache/*.php
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+!storage/framework/.gitkeep
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/views/.gitkeep
+
+# Database
+database/*.sqlite
+
+# Compiled assets
+public/build/
+public/hot

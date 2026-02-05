@@ -113,15 +113,29 @@ const ANSWER_VALIDATION_SCHEMA = {
 
 /**
  * Validates a task answer using AI
+ * Tries backend proxy first, then falls back to direct API call
  * @param {Object} task - Task object with content and imageData
  * @param {string} userAnswer - Student's answer
  * @returns {Promise<Object>} Validation result
  */
 async function validateTaskAnswer(task, userAnswer) {
+    // Try backend proxy first (recommended)
+    const useBackendProxy = window.USE_BACKEND_PROXY !== false;
+
+    if (useBackendProxy) {
+        try {
+            return await validateAnswerViaBackend(task, userAnswer);
+        } catch (proxyError) {
+            console.warn('[TaskValidator] Backend validation failed, trying direct API:', proxyError.message);
+            // Fall through to direct API call
+        }
+    }
+
+    // Direct API call (fallback)
     const apiKey = getApiKey();
 
     if (!apiKey) {
-        throw new Error('OpenAI API-Schlüssel nicht konfiguriert');
+        throw new Error('OpenAI API-Schlüssel nicht konfiguriert. Bitte im Profil unter "API Konfiguration" eingeben.');
     }
 
     if (task.hasImage && task.imageData) {
@@ -129,6 +143,34 @@ async function validateTaskAnswer(task, userAnswer) {
     } else {
         return await validateAnswerWithText(task.content, userAnswer, apiKey);
     }
+}
+
+/**
+ * Validate answer using the backend API proxy
+ * This is the recommended method as the API key is stored securely on the server
+ */
+async function validateAnswerViaBackend(task, userAnswer) {
+    const response = await fetch('/api/ai/validate-answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            task: {
+                content: task.content,
+                hasImage: task.hasImage || false,
+                imageData: task.imageData || null,
+            },
+            answer: userAnswer
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `Backend Fehler: ${response.status}`);
+    }
+
+    return await response.json();
 }
 
 /**
@@ -205,9 +247,26 @@ ${studentAnswer}`
 }
 
 /**
- * Calls OpenAI API with function calling
+ * Calls AI API - tries backend proxy first, falls back to direct API call
  */
 async function callOpenAI(messages, apiKey) {
+    // Try backend proxy first (recommended for production)
+    const useBackendProxy = window.USE_BACKEND_PROXY !== false;
+
+    if (useBackendProxy) {
+        try {
+            return await callBackendProxy(messages);
+        } catch (proxyError) {
+            console.warn('[TaskValidator] Backend proxy failed, trying direct API:', proxyError.message);
+            // Fall through to direct API call
+        }
+    }
+
+    // Direct API call (fallback or development)
+    if (!apiKey) {
+        throw new Error('Kein API-Key verfügbar. Bitte im Profil konfigurieren.');
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -242,6 +301,60 @@ async function callOpenAI(messages, apiKey) {
         confidence: 50,
         feedback: {
             summary: data.choices[0]?.message?.content || "Konnte nicht validieren",
+            approach: "",
+            calculation: ""
+        },
+        errorAnalysis: {
+            hasErrors: true,
+            errorTypes: []
+        }
+    };
+}
+
+/**
+ * Call backend proxy for AI requests
+ * The backend handles the API key securely
+ */
+async function callBackendProxy(messages) {
+    const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            messages: messages,
+            model: 'gpt-4o',
+            temperature: 0.3,
+            tools: [{
+                type: 'function',
+                function: {
+                    name: 'validate_answer',
+                    description: ANSWER_VALIDATION_SCHEMA.description,
+                    parameters: ANSWER_VALIDATION_SCHEMA.parameters
+                }
+            }],
+            tool_choice: { type: 'function', function: { name: 'validate_answer' } }
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || `Backend API Fehler: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Extract function call result from backend response
+    if (data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments) {
+        return JSON.parse(data.choices[0].message.tool_calls[0].function.arguments);
+    }
+
+    // Fallback
+    return {
+        correct: false,
+        confidence: 50,
+        feedback: {
+            summary: data.choices?.[0]?.message?.content || "Konnte nicht validieren",
             approach: "",
             calculation: ""
         },

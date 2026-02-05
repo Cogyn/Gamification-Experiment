@@ -1,5 +1,27 @@
 // EduRank Configuration
 const CONFIG = {
+  // Backend API Configuration
+  api: {
+    // Use backend proxy for AI calls (recommended for production)
+    // Set to false to use direct API calls with local API key
+    useBackendProxy: true,
+
+    // Backend API base URL (auto-detected, or set manually)
+    baseUrl: window.location.origin,
+
+    // Endpoints
+    endpoints: {
+      health: '/api/health',
+      aiChat: '/api/ai/chat',
+      aiValidate: '/api/ai/validate-answer',
+      aiGenerate: '/api/ai/generate-task',
+      aiExplain: '/api/ai/explain',
+      users: '/api/users',
+      tasks: '/api/tasks',
+      achievements: '/api/achievements',
+    }
+  },
+
   // XP curve for leveling (Level: Required Total XP)
   xpCurve: {
     1: 0,
@@ -27,7 +49,8 @@ const CONFIG = {
 
   subjects: [
     { id: 1, name: 'Mathematik', slug: 'math', color: '#ef4444', icon: '📐' },
-    // More subjects coming in Phase 2
+    { id: 2, name: 'Physik', slug: 'physics', color: '#3b82f6', icon: '⚛️' },
+    { id: 3, name: 'Chemie', slug: 'chemistry', color: '#22c55e', icon: '🧪' },
   ],
 
   // AI Configuration
@@ -68,4 +91,42 @@ for (let level = 21; level <= 100; level++) {
 // Helper function to get XP for a specific level
 function getXPForLevel(level) {
   return CONFIG.xpCurve[level] || CONFIG.xpCurve[100];
+}
+
+// Set global flag for backend proxy usage
+// This can be overridden by setting window.USE_BACKEND_PROXY = false before loading
+if (typeof window.USE_BACKEND_PROXY === 'undefined') {
+  window.USE_BACKEND_PROXY = CONFIG.api.useBackendProxy;
+}
+
+// Helper to get API endpoint URL
+function getApiEndpoint(endpoint) {
+  const baseUrl = CONFIG.api.baseUrl || '';
+  return baseUrl + (CONFIG.api.endpoints[endpoint] || endpoint);
+}
+
+// Check if backend is available
+async function checkBackendHealth() {
+  try {
+    const response = await fetch(getApiEndpoint('health'), {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log('[Config] Backend health check passed:', data);
+      return true;
+    }
+  } catch (e) {
+    console.warn('[Config] Backend not available, using local mode:', e.message);
+  }
+  window.USE_BACKEND_PROXY = false;
+  return false;
+}
+
+// Auto-check backend on load (non-blocking)
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    checkBackendHealth().catch(() => {});
+  }, 1000);
 }
