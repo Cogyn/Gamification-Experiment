@@ -10,9 +10,34 @@
     <script>
         (function() {
             const token = localStorage.getItem('cogyn_token');
-            if (!token) {
+            const user = localStorage.getItem('cogyn_user');
+
+            // Require both token AND user data (set by new login system)
+            if (!token || !user) {
+                // Clear any old/partial auth data
+                localStorage.removeItem('cogyn_token');
+                localStorage.removeItem('cogyn_user');
                 window.location.href = '/login.html';
+                return;
             }
+
+            // Verify token with API in background
+            fetch('/api/users/profile', {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    // Token invalid, clear and redirect
+                    localStorage.removeItem('cogyn_token');
+                    localStorage.removeItem('cogyn_user');
+                    window.location.href = '/login.html';
+                }
+            }).catch(() => {
+                // API error, but don't redirect - might be temporary
+                console.warn('Could not verify token with API');
+            });
         })();
     </script>
 
