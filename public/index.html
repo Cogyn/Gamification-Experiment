@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cogyn - Adaptive Lernplattform</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="splash-animation.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- MathJax für mathematische Notationen -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                packages: {'[+]': ['ams', 'noerrors', 'noundefined']},
+                // Deaktiviere babel-german shortcuts ("a -> ä etc.)
+                // da diese mit normalen Anführungszeichen kollidieren
+                macros: {}
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process',
+                // Verhindere, dass MathJax Text außerhalb von Delimitern verarbeitet
+                renderActions: {
+                    addMenu: [0, '', '']
+                }
+            },
+            startup: {
+                ready() {
+                    MathJax.startup.defaultReady();
+                    console.log('MathJax ist bereit');
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Simple Auth Service (LocalStorage-based, no backend) -->
+    <script src="auth-simple.js"></script>
+    
+    <!-- Tracking Services -->
+    <script src="tracking/competency-tracker.js"></script>
+    <script src="tracking/performance-tracker.js"></script>
+    <script src="tracking/behavior-tracker.js"></script>
+    <script src="tracking/strength-weakness-tracker.js"></script>
+    
+    <!-- Competency Schema -->
+    <script src="data/competency-schema.js"></script>
+    
+    <!-- AI Services -->
+    <script src="ai/data-aggregator.js"></script>
+    <script src="ai/prompt-advisor.js"></script>
+    
+    <!-- Function Plot für Graphen -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/function-plot@1/dist/function-plot.min.js"></script>
+    <script src="graph-renderer.js"></script>
+    
+    <!-- Math.js für mathematische Validierung -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@12/lib/browser/math.min.js"></script>
+    
+    <!-- Test-Daten für Unit Tests -->
+    <script src="test-data.js?v=3"></script>
+    
+    <!-- Programmatische Variationen und Templates -->
+    <script src="task-variations.js"></script>
+    <script src="feedback-templates.js?v=4"></script>
+    <script src="topic-data.js"></script>
+
+    <!-- Gamification System -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/edurank-integration.js"></script>
+</head>
+<body>
+    <!-- =====================================================
+         SPLASH ANIMATION OVERLAY
+         Futuristic Matrix-style loading animation
+         ===================================================== -->
+    <div id="splash-overlay" class="splash-overlay">
+        <!-- Top split panel -->
+        <div class="splash-top">
+            <div class="matrix-bg"></div>
+            <div class="circuit-lines"></div>
+        </div>
+        
+        <!-- Bottom split panel -->
+        <div class="splash-bottom">
+            <div class="matrix-bg"></div>
+            <div class="circuit-lines"></div>
+        </div>
+        
+        <!-- Horizontal light line -->
+        <div class="light-line"></div>
+        
+        <!-- Corner decorations -->
+        <div class="corner-decoration corner-tl"></div>
+        <div class="corner-decoration corner-tr"></div>
+        <div class="corner-decoration corner-bl"></div>
+        <div class="corner-decoration corner-br"></div>
+        
+        <!-- Glow effect -->
+        <div class="splash-glow"></div>
+        
+        <!-- Logo container with animated SVG -->
+        <div class="logo-container">
+            <svg class="splash-logo" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Gradients -->
+                    <linearGradient id="splashGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#40E0D0;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1E6B6B;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="splashGradient2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#0D3D3D;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#40E0D0;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="coreGradient" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#40E0D0;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#1E6B6B;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0D3D3D;stop-opacity:1" />
+                    </radialGradient>
+                    
+                    <!-- Glow filter -->
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <!-- ===== TOP ARM / TOWER ===== -->
+                <g class="logo-arm logo-arm-top">
+                    <!-- Main tower stem -->
+                    <path d="M150 130 L150 60 L145 55 L150 40 L155 55 L150 60" 
+                          fill="none" stroke="url(#splashGradient1)" stroke-width="3"/>
+                    
+                    <!-- Tower hexagon top -->
+                    <polygon points="150,25 160,32 160,45 150,52 140,45 140,32" 
+                             fill="url(#coreGradient)" stroke="#40E0D0" stroke-width="2"/>
+                    
+                    <!-- Tower circuit lines -->
+                    <path d="M145 60 L135 65 L135 75 M155 60 L165 65 L165 75" 
+                          fill="none" stroke="#40E0D0" stroke-width="1.5" opacity="0.8"/>
+                    
+                    <!-- Tower base connectors -->
+                    <path d="M140 75 L140 90 L145 95 M160 75 L160 90 L155 95" 
+                          fill="none" stroke="#1E6B6B" stroke-width="2"/>
+                    
+                    <!-- Small circuit nodes -->
+                    <circle cx="135" cy="75" r="3" fill="#40E0D0"/>
+                    <circle cx="165" cy="75" r="3" fill="#40E0D0"/>
+                    
+                    <!-- Decorative lines -->
+                    <line x1="150" y1="52" x2="150" y2="95" stroke="#40E0D0" stroke-width="2" opacity="0.6"/>
+                </g>
+                
+                <!-- ===== BOTTOM LEFT ARM ===== -->
+                <g class="logo-arm logo-arm-left">
+                    <!-- Main arm structure -->
+                    <path d="M115 220 L70 250 L55 248 L40 260 L50 245 L55 248" 
+                          fill="none" stroke="url(#splashGradient1)" stroke-width="3"/>
+                    
+                    <!-- Circuit board pattern -->
+                    <path d="M80 245 L75 255 L60 258 M85 250 L90 260 L80 265" 
+                          fill="none" stroke="#40E0D0" stroke-width="1.5" opacity="0.8"/>
+                    
+                    <!-- Hexagon end piece -->
+                    <polygon points="40,255 50,250 58,255 58,265 50,270 40,265" 
+                             fill="url(#coreGradient)" stroke="#40E0D0" stroke-width="1.5"/>
+                    
+                    <!-- Circuit nodes -->
+                    <circle cx="75" cy="255" r="2.5" fill="#40E0D0"/>
+                    <circle cx="90" cy="260" r="2.5" fill="#40E0D0"/>
+                    
+                    <!-- Additional circuit traces -->
+                    <path d="M100 230 L95 235 L85 235 L80 240" 
+                          fill="none" stroke="#1E6B6B" stroke-width="2"/>
+                    
+                    <!-- Small decorative elements -->
+                    <rect x="62" y="252" width="8" height="3" fill="#40E0D0" opacity="0.6"/>
+                </g>
+                
+                <!-- ===== BOTTOM RIGHT ARM ===== -->
+                <g class="logo-arm logo-arm-right">
+                    <!-- Main arm structure (mirrored) -->
+                    <path d="M185 220 L230 250 L245 248 L260 260 L250 245 L245 248" 
+                          fill="none" stroke="url(#splashGradient1)" stroke-width="3"/>
+                    
+                    <!-- Circuit board pattern -->
+                    <path d="M220 245 L225 255 L240 258 M215 250 L210 260 L220 265" 
+                          fill="none" stroke="#40E0D0" stroke-width="1.5" opacity="0.8"/>
+                    
+                    <!-- Hexagon end piece -->
+                    <polygon points="260,255 250,250 242,255 242,265 250,270 260,265" 
+                             fill="url(#coreGradient)" stroke="#40E0D0" stroke-width="1.5"/>
+                    
+                    <!-- Circuit nodes -->
+                    <circle cx="225" cy="255" r="2.5" fill="#40E0D0"/>
+                    <circle cx="210" cy="260" r="2.5" fill="#40E0D0"/>
+                    
+                    <!-- Additional circuit traces -->
+                    <path d="M200 230 L205 235 L215 235 L220 240" 
+                          fill="none" stroke="#1E6B6B" stroke-width="2"/>
+                    
+                    <!-- Small decorative elements -->
+                    <rect x="230" y="252" width="8" height="3" fill="#40E0D0" opacity="0.6"/>
+                </g>
+                
+                <!-- ===== OUTER RING ===== -->
+                <g class="logo-ring-outer" filter="url(#glow)">
+                    <circle cx="150" cy="175" r="70" fill="none" 
+                            stroke="url(#splashGradient1)" stroke-width="4" opacity="0.9"/>
+                    <!-- Ring segments/markers -->
+                    <circle cx="150" cy="105" r="4" fill="#40E0D0"/>
+                    <circle cx="210.6" cy="140" r="3" fill="#40E0D0"/>
+                    <circle cx="210.6" cy="210" r="3" fill="#40E0D0"/>
+                    <circle cx="150" cy="245" r="4" fill="#40E0D0"/>
+                    <circle cx="89.4" cy="210" r="3" fill="#40E0D0"/>
+                    <circle cx="89.4" cy="140" r="3" fill="#40E0D0"/>
+                </g>
+                
+                <!-- ===== MIDDLE RING ===== -->
+                <g class="logo-ring-middle">
+                    <circle cx="150" cy="175" r="55" fill="none" 
+                            stroke="#1E6B6B" stroke-width="6" opacity="0.8"/>
+                    <!-- Dashed inner line -->
+                    <circle cx="150" cy="175" r="52" fill="none" 
+                            stroke="#40E0D0" stroke-width="1" stroke-dasharray="8 4" opacity="0.5"/>
+                </g>
+                
+                <!-- ===== INNER RING ===== -->
+                <g class="logo-ring-inner">
+                    <circle cx="150" cy="175" r="40" fill="none" 
+                            stroke="url(#splashGradient2)" stroke-width="3"/>
+                    <!-- Tick marks -->
+                    <line x1="150" y1="135" x2="150" y2="140" stroke="#40E0D0" stroke-width="2"/>
+                    <line x1="150" y1="210" x2="150" y2="215" stroke="#40E0D0" stroke-width="2"/>
+                    <line x1="110" y1="175" x2="115" y2="175" stroke="#40E0D0" stroke-width="2"/>
+                    <line x1="185" y1="175" x2="190" y2="175" stroke="#40E0D0" stroke-width="2"/>
+                </g>
+                
+                <!-- ===== CORE STRUCTURE ===== -->
+                <g class="logo-core">
+                    <!-- Outer core circle -->
+                    <circle cx="150" cy="175" r="30" fill="#0D3D3D" 
+                            stroke="#40E0D0" stroke-width="2"/>
+                    
+                    <!-- Core ring decoration -->
+                    <circle cx="150" cy="175" r="25" fill="none" 
+                            stroke="#1E6B6B" stroke-width="3"/>
+                    
+                    <!-- Middle hexagon -->
+                    <polygon points="150,155 167,165 167,185 150,195 133,185 133,165" 
+                             fill="none" stroke="#40E0D0" stroke-width="2"/>
+                    
+                    <!-- Inner hexagon -->
+                    <polygon points="150,162 160,168 160,182 150,188 140,182 140,168" 
+                             fill="url(#coreGradient)" stroke="#40E0D0" stroke-width="1.5"/>
+                    
+                    <!-- Center hexagon (smallest) -->
+                    <polygon points="150,169 155,172 155,178 150,181 145,178 145,172" 
+                             fill="#40E0D0" stroke="#0D3D3D" stroke-width="1"/>
+                    
+                    <!-- Core inner details -->
+                    <circle cx="150" cy="175" r="5" fill="#0D3D3D" stroke="#40E0D0" stroke-width="1"/>
+                </g>
+                
+                <!-- ===== CROSSHAIR LINES ===== -->
+                <g opacity="0.4">
+                    <line x1="80" y1="175" x2="220" y2="175" stroke="#40E0D0" stroke-width="0.5"/>
+                    <line x1="150" y1="100" x2="150" y2="250" stroke="#40E0D0" stroke-width="0.5"/>
+                    <!-- Diagonal lines -->
+                    <line x1="100" y1="125" x2="200" y2="225" stroke="#40E0D0" stroke-width="0.5" opacity="0.3"/>
+                    <line x1="200" y1="125" x2="100" y2="225" stroke="#40E0D0" stroke-width="0.5" opacity="0.3"/>
+                </g>
+                
+                <!-- ===== DECORATIVE BRACKETS ===== -->
+                <g opacity="0.6">
+                    <!-- Left bracket -->
+                    <path d="M70 150 L65 155 L65 195 L70 200" 
+                          fill="none" stroke="#40E0D0" stroke-width="1.5"/>
+                    <!-- Right bracket -->
+                    <path d="M230 150 L235 155 L235 195 L230 200" 
+                          fill="none" stroke="#40E0D0" stroke-width="1.5"/>
+                </g>
+            </svg>
+        </div>
+        
+        <!-- Loading text -->
+        <div class="splash-text">Initializing</div>
+        
+        <!-- Skip button -->
+        <button class="splash-skip">Skip</button>
+    </div>
+    
+    <!-- White overlay for smooth transition with CogynAI branding -->
+    <div class="white-overlay">
+        <div class="branding-container">
+            <span class="branding-text"><span class="text-cogyn">Cogyn</span><span class="text-a">A</span><span class="text-i">I</span></span>
+            <img src="logo.png" alt="CogynAI Logo" class="branding-logo">
+        </div>
+    </div>
+
+    <!-- Simple Auth Script (LocalStorage-based, auto-login) -->
+    <script>
+        // Auto-login: User wird automatisch erstellt beim ersten Besuch
+        // Wait for page load to ensure auth-simple.js is loaded
+        window.addEventListener('load', function() {
+            console.log('[Auth] Page loaded, initializing auth...');
+
+            try {
+                // AuthService should be initialized in auth-simple.js
+                const authService = window.authService;
+
+                if (!authService) {
+                    console.error('[Auth] AuthService not initialized!');
+                    console.error('[Auth] Check if auth-simple.js loaded correctly');
+                    // Create emergency fallback
+                    console.log('[Auth] Creating emergency auth instance...');
+                    window.authService = new AuthService();
+                }
+
+                const user = window.authService.getCurrentUser();
+
+                if (user) {
+                    console.log('[Auth] ✅ User logged in:', user.name);
+                    window.currentUser = user;
+                    setupUserInterface(user, window.authService);
+
+                    // Show welcome dialog on first visit
+                    setTimeout(() => {
+                        window.authService.showWelcomeDialog();
+                    }, 1000);
+                } else {
+                    console.error('[Auth] ❌ Failed to get user');
+                }
+            } catch (error) {
+                console.error('[Auth] ❌ Error:', error);
+                console.error('[Auth] Stack:', error.stack);
+            }
+        });
+
+        // Setup User Interface Elements
+        function setupUserInterface(user, authService) {
+            document.addEventListener('DOMContentLoaded', function() {
+                // Update user name display
+                const userNameDisplay = document.getElementById('user-name-display');
+                const userEmailDisplay = document.getElementById('user-email-display');
+                const userAvatarInitials = document.getElementById('user-avatar-initials');
+                const userInfo = document.getElementById('user-info');
+
+                if (userNameDisplay) {
+                    userNameDisplay.textContent = user.name || 'Lernender';
+                }
+
+                if (userEmailDisplay) {
+                    userEmailDisplay.textContent = user.email || 'Keine E-Mail';
+                }
+
+                if (userAvatarInitials) {
+                    const initials = (user.name || 'L').split(' ')
+                        .map(n => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .substring(0, 2);
+                    userAvatarInitials.textContent = initials;
+                }
+
+                if (userInfo) {
+                    userInfo.style.display = 'flex';
+                }
+
+                // Profile name input
+                const userNameInput = document.getElementById('user-name');
+                if (userNameInput) {
+                    userNameInput.value = user.name || '';
+                    userNameInput.readOnly = false;
+
+                    // Save name on change
+                    userNameInput.addEventListener('change', function() {
+                        const newName = this.value.trim();
+                        if (newName) {
+                            authService.updateUserName(newName);
+                            if (userNameDisplay) {
+                                userNameDisplay.textContent = newName;
+                            }
+                            if (userAvatarInitials) {
+                                const initials = newName.split(' ')
+                                    .map(n => n[0])
+                                    .join('')
+                                    .toUpperCase()
+                                    .substring(0, 2);
+                                userAvatarInitials.textContent = initials;
+                            }
+
+                            // Also update gamification profile name
+                            const profileNameEl = document.getElementById('profile-name');
+                            if (profileNameEl) {
+                                profileNameEl.textContent = newName;
+                            }
+                        }
+                    });
+                }
+
+                // Profile email input
+                const userEmailInput = document.getElementById('user-email');
+                if (userEmailInput) {
+                    userEmailInput.value = user.email || '';
+                    userEmailInput.readOnly = false;
+
+                    // Save email on change
+                    userEmailInput.addEventListener('change', function() {
+                        const newEmail = this.value.trim();
+                        if (newEmail) {
+                            authService.updateUserEmail(newEmail);
+                            if (userEmailDisplay) {
+                                userEmailDisplay.textContent = newEmail;
+                            }
+                        }
+                    });
+                }
+
+                // Logout button (optional - clears all data)
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        if (confirm('⚠️ Möchtest du dich abmelden?\n\nDies wird ALLE deine Daten löschen (inkl. Gamification-Fortschritt)!')) {
+                            authService.logout(true);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    <!-- App Layout Container -->
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Cogyn Logo" class="logo-img">
+                <h1>Cogyn</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-section="text-input">
+                    <i class="fas fa-question-circle"></i> Aufgabe Erklären
+                </a>
+                <a href="#" class="nav-item" data-section="image-upload">
+                    <i class="fas fa-check-circle"></i> Aufgabe korrigieren
+                </a>
+                <a href="#" class="nav-item" data-section="generate-task">
+                    <i class="fas fa-magic"></i> Aufgabe generieren
+                </a>
+                <a href="#" class="nav-item" data-section="task-upload">
+                    <i class="fas fa-upload"></i> Aufgabe hochladen
+                </a>
+                <a href="#" class="nav-item" data-section="my-tasks">
+                    <i class="fas fa-tasks"></i> Meine Aufgaben
+                </a>
+                <a href="#" class="nav-item" data-section="achievements">
+                    <i class="fas fa-trophy"></i> Achievements
+                </a>
+            </nav>
+            <div class="sidebar-stats">
+                <!-- Gamification Widgets -->
+                <div class="gamification-widgets">
+                    <!-- Level Badge -->
+                    <div class="level-widget">
+                        <div class="level-badge">
+                            <span id="user-level">1</span>
+                        </div>
+                        <div class="level-info">
+                            <div class="level-label">Level</div>
+                            <div class="xp-bar">
+                                <div class="xp-bar-fill" id="xp-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="xp-text">
+                                <span id="current-xp">0</span> / <span id="next-level-xp">100</span> XP
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon">🪙</div>
+                            <div class="stat-value" id="coins">0</div>
+                            <div class="stat-label">Coins</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-value" id="streak">0</div>
+                            <div class="stat-label">Streak</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Task Widget -->
+                <div class="current-task" id="current-task-widget">
+                    <div class="task-label">Aktuelle Aufgabe</div>
+                    <div class="task-title">Keine Aufgabe aktiv</div>
+                </div>
+                
+                <!-- Progress Widget -->
+                <div class="progress-widget">
+                    <h4>Fortschritt heute</h4>
+                    <div class="progress-label">
+                        <span>Gelöst</span>
+                        <span class="progress-count" id="progress-count">0/5</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Error Stats Widget -->
+                <div class="error-stats">
+                    <h4>Fehler heute</h4>
+                    <div class="stat-grid">
+                        <div class="stat-item stat-logic">
+                            <span class="stat-count" id="stat-logic">0</span>
+                            <span class="stat-label">Logik</span>
+                        </div>
+                        <div class="stat-item stat-calc">
+                            <span class="stat-count" id="stat-calc">0</span>
+                            <span class="stat-label">Rechnung</span>
+                        </div>
+                        <div class="stat-item stat-followup">
+                            <span class="stat-count" id="stat-followup">0</span>
+                            <span class="stat-label">Folge</span>
+                        </div>
+                        <div class="stat-item stat-formal">
+                            <span class="stat-count" id="stat-formal">0</span>
+                            <span class="stat-label">Formal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendations Widget -->
+                <div class="recommendations" id="recommendations-widget">
+                    <h4>Empfehlungen</h4>
+                    <div class="recommendation-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Starte mit einer Übungsaufgabe</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" data-section="user-profile">
+                    <i class="fas fa-user"></i> Profil
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo-mobile">
+                <img src="logo.png" alt="Cogyn Logo" class="logo-img-mobile">
+                <span>Cogyn</span>
+            </div>
+            <button class="profile-toggle" id="profile-toggle">
+                <i class="fas fa-user"></i>
+            </button>
+        </header>
+        
+        <!-- Sidebar Overlay (for mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content">
+            <!-- Content Tabs (visible on desktop as secondary nav) -->
+            <div class="content-tabs" id="content-tabs">
+                <button class="tab-btn active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </button>
+                <button class="tab-btn" data-tab="text-input">
+                    <i class="fas fa-question-circle"></i>
+                    Erklären
+                </button>
+                <button class="tab-btn" data-tab="image-upload">
+                    <i class="fas fa-check-circle"></i>
+                    Korrigieren
+                </button>
+                <button class="tab-btn" data-tab="generate-task">
+                    <i class="fas fa-magic"></i>
+                    Generieren
+                </button>
+                <button class="tab-btn" data-tab="user-profile">
+                    <i class="fas fa-user"></i>
+                    Profil
+                </button>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard / Welcome Section -->
+                <section class="welcome-section tab-content active" id="dashboard">
+                <div class="welcome-content hero-grid">
+                    <div class="hero-card">
+                        <div class="hero-content">
+                            <img src="logo.png" alt="Cogyn Logo" class="hero-logo-img">
+                            <div>
+                                                <div class="eyebrow">Dein persönlicher Tutor</div>
+                                                <h2>Mathematik verstehen mit KI</h2>
+                                                <p>Cogyn analysiert deine Lösungswege, erkennt Fehlerquellen und gibt dir individuelles Feedback. Lerne effektiver durch adaptive Aufgaben und gezielte Hilfestellungen.</p>
+                                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-highlights">
+                        <div class="pill-card">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <strong>KI-Fehleranalyse</strong>
+                                <span>Intelligente Erkennung von Rechen-, Logik- und Folgefehlern mit präzisen Erklärungen.</span>
+                            </div>
+                        </div>
+                        <div class="pill-card">
+                            <i class="fas fa-user-graduate"></i>
+                            <div>
+                                <strong>Adaptives Lernen</strong>
+                                <span>Personalisierte Aufgaben, die sich deinem Lernfortschritt und deinen Schwächen anpassen.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Action Buttons -->
+                    <div class="dashboard-actions">
+                        <a class="action-card" href="#" data-section="text-input">
+                            <div class="action-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h3>Aufgabe erklären</h3>
+                            <p>Lass dir Mathe-Konzepte verständlich erklären</p>
+                        </a>
+                        <a class="action-card" href="#" data-section="image-upload">
+                            <div class="action-icon">
+                                <i class="fas fa-pen-to-square"></i>
+                            </div>
+                            <h3>Aufgabe korrigieren</h3>
+                            <p>Lade deine Lösung hoch und finde Fehler</p>
+                        </a>
+                        <a class="action-card" href="#" data-section="generate-task">
+                            <div class="action-icon">
+                                <i class="fas fa-wand-magic-sparkles"></i>
+                            </div>
+                            <h3>Aufgabe generieren</h3>
+                            <p>Erstelle personalisierte Übungsaufgaben</p>
+                        </a>
+                    </div>
+
+                    <!-- Gamification Dashboard -->
+                    <section class="gamification-dashboard">
+                        <h2>Dein Fortschritt</h2>
+
+                        <div class="dashboard-cards">
+                            <!-- Level Card -->
+                            <div class="dashboard-card">
+                                <div class="card-icon">⭐</div>
+                                <div class="card-content">
+                                    <div class="card-label">Aktuelles Level</div>
+                                    <div class="card-value" id="dashboard-level">1</div>
+                                    <div class="card-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="dashboard-xp-fill" style="width: 0%"></div>
+                                        </div>
+                                        <div class="progress-text">
+                                            <span id="dashboard-current-xp">0</span> / <span id="dashboard-next-xp">100</span> XP
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Streak Card -->
+                            <div class="dashboard-card">
+                                <div class="card-icon">🔥</div>
+                                <div class="card-content">
+                                    <div class="card-label">Aktueller Streak</div>
+                                    <div class="card-value" id="dashboard-streak">0</div>
+                                    <div class="card-sublabel">
+                                        Längster Streak: <strong id="dashboard-longest-streak">0</strong> Tage
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Coins Card -->
+                            <div class="dashboard-card">
+                                <div class="card-icon">🪙</div>
+                                <div class="card-content">
+                                    <div class="card-label">Brain Coins</div>
+                                    <div class="card-value" id="dashboard-coins">0</div>
+                                    <div class="card-sublabel">Gesammelte Währung</div>
+                                </div>
+                            </div>
+
+                            <!-- Subject Mastery Card -->
+                            <div class="dashboard-card wide">
+                                <div class="card-content">
+                                    <div class="card-label">Fach-Meisterschaft</div>
+                                    <div id="subject-mastery-list">
+                                        <!-- Dynamisch gefüllt durch JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+                <!-- Text Input Tab - Aufgabe Erklären -->
+                <section class="tab-content" id="text-input">
+                    <div class="input-container">
+                        <div class="input-header">
+                            <h3>Aufgabe Erklären</h3>
+                            <p>Stelle deine Mathematik-Frage und lass sie dir verständlich erklären:</p>
+                        </div>
+                        <div class="text-input-area">
+                            <textarea 
+                                id="math-input" 
+                                placeholder="Beispiel: Erkläre mir die Ableitung von x² oder Wie löse ich die Gleichung 2x + 5 = 13?"
+                                rows="6"
+                            ></textarea>
+                            <div class="input-actions">
+                                <button class="btn btn-primary" id="analyze-btn">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Erklärung erhalten
+                                </button>
+                                <button class="btn btn-secondary" id="clear-btn">
+                                    <i class="fas fa-trash"></i>
+                                    Löschen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Image Upload Tab - Aufgabe korrigieren -->
+                <section class="tab-content" id="image-upload">
+                    <div class="input-container">
+                        <div class="input-header">
+                            <h3>Aufgabe korrigieren</h3>
+                            <p>Lade ein Foto deiner Lösung hoch und lass sie auf Fehler überprüfen:</p>
+                        </div>
+                        <div class="image-upload-area">
+                            <div class="upload-zone" id="upload-zone">
+                                <i class="fas fa-camera"></i>
+                                <p class="upload-hint">Klicke hier oder ziehe dein Lösungsbild hierher</p>
+                                <p class="upload-subhint">Unterstützt: JPG, PNG, GIF (mehrere Bilder möglich)</p>
+                                <input type="file" id="image-input" accept="image/*" hidden multiple>
+                            </div>
+                            <div class="image-preview" id="image-preview" style="display: none;">
+                                <div class="preview-header">
+                                    <span class="preview-count" id="preview-count">0 Bilder</span>
+                                    <div class="preview-actions">
+                                        <button class="btn btn-secondary btn-sm" id="add-more-images">
+                                            <i class="fas fa-plus"></i>
+                                            Weitere hinzufügen
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" id="remove-all-images">
+                                            <i class="fas fa-trash"></i>
+                                            Alle entfernen
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="preview-list" id="image-preview-list"></div>
+                            </div>
+                        </div>
+                        <div class="image-description-area" id="image-description-area" style="display: none;">
+                            <div class="form-group">
+                                <label for="image-description">Extrawünsche (optional):</label>
+                                <textarea 
+                                    id="image-description" 
+                                    placeholder="z.B. 'Erkläre mir besonders den zweiten Schritt' oder 'Prüfe ob mein Ansatz richtig ist' oder lass es leer für eine vollständige Korrektur..."
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                            <div class="input-actions">
+                                <button class="btn btn-primary" id="analyze-image-btn">
+                                    <i class="fas fa-search"></i>
+                                    Lösung korrigieren
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Generate Task Tab -->
+                <section class="tab-content" id="generate-task">
+                    <div class="input-container">
+                        <div class="input-header">
+                            <h3>Neue Aufgabe generieren</h3>
+                            <p>Lass die KI eine personalisierte Mathematik-Aufgabe für dich erstellen:</p>
+                        </div>
+
+                        <div class="task-generation-form">
+                            <!-- Themenauswahl mit Unterthemen (Fuzzy-Suche) -->
+                            <div class="form-group topic-selection">
+                                <label for="topic-search-input">
+                                    <i class="fas fa-book"></i> Thema:
+                                </label>
+                                <div class="topic-search-wrapper">
+                                    <input type="text" 
+                                           id="topic-search-input" 
+                                           class="topic-search-input" 
+                                           placeholder="Thema suchen oder auswählen..."
+                                           autocomplete="off">
+                                    <input type="hidden" id="topic-select-value">
+                                    <i class="fas fa-chevron-down dropdown-icon" id="topic-dropdown-icon"></i>
+                                    <button type="button" class="topic-clear-btn" id="topic-clear-btn" title="Auswahl löschen">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div class="topic-dropdown-list" id="topic-dropdown-list">
+                                        <!-- Wird dynamisch befüllt -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Dynamisches Unterthemen-Dropdown -->
+                                <div class="subtopic-wrapper" id="subtopic-wrapper">
+                                    <label for="subtopic-select">
+                                        <i class="fas fa-layer-group"></i> Unterthema:
+                                    </label>
+                                    <div class="custom-dropdown" id="subtopic-dropdown-wrapper">
+                                        <button type="button" class="custom-dropdown-trigger" id="subtopic-trigger">
+                                            <span class="dropdown-trigger-text">-- Optional: Unterthema wählen --</span>
+                                            <i class="fas fa-chevron-down dropdown-icon"></i>
+                                        </button>
+                                        <input type="hidden" id="subtopic-select" value="">
+                                        <div class="custom-dropdown-list" id="subtopic-dropdown-list">
+                                            <!-- Wird dynamisch befüllt -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Spezielle Wünsche -->
+                            <div class="form-group special-wishes">
+                                <label for="special-wishes-input">
+                                    <i class="fas fa-star"></i> Spezielle Wünsche (optional):
+                                </label>
+                                <input type="text" id="special-wishes-input" 
+                                       placeholder="z.B. 'mit Brüchen', 'ohne Taschenrechner', 'Anwendung Physik'..."
+                                       class="wishes-input">
+                            </div>
+                            
+                            <!-- Aufgabentyp -->
+                            <div class="form-group task-type-selection">
+                                <label for="task-type-select">
+                                    <i class="fas fa-tasks"></i> Aufgabentyp:
+                                </label>
+                                <div class="custom-dropdown" id="task-type-dropdown-wrapper">
+                                    <button type="button" class="custom-dropdown-trigger" id="task-type-trigger">
+                                        <span class="dropdown-trigger-text">-- Aufgabentyp wählen --</span>
+                                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                                    </button>
+                                    <input type="hidden" id="task-type-select" value="">
+                                    <div class="custom-dropdown-list" id="task-type-dropdown-list">
+                                        <div class="custom-dropdown-item" data-value="berechnung">
+                                            <i class="fas fa-calculator"></i>
+                                            <span class="dropdown-item-text">Berechnung</span>
+                                            <span class="dropdown-item-desc">Mathematische Aufgabe ohne Textkontext</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="theorie">
+                                            <i class="fas fa-book"></i>
+                                            <span class="dropdown-item-text">Theorie</span>
+                                            <span class="dropdown-item-desc">Erkläre, beweise oder definiere</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="sachaufgabe">
+                                            <i class="fas fa-file-alt"></i>
+                                            <span class="dropdown-item-text">Sachaufgabe</span>
+                                            <span class="dropdown-item-desc">Textaufgabe mit realem Kontext</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Schwierigkeit -->
+                            <div class="form-group difficulty-selection">
+                                <label for="difficulty-select">
+                                    <i class="fas fa-signal"></i> Schwierigkeit:
+                                </label>
+                                <div class="custom-dropdown" id="difficulty-dropdown-wrapper">
+                                    <button type="button" class="custom-dropdown-trigger" id="difficulty-trigger">
+                                        <span class="dropdown-trigger-text">-- Schwierigkeit wählen --</span>
+                                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                                    </button>
+                                    <input type="hidden" id="difficulty-select" value="">
+                                    <div class="custom-dropdown-list" id="difficulty-dropdown-list">
+                                        <div class="custom-dropdown-item" data-value="einsteiger">
+                                            <i class="fas fa-seedling"></i>
+                                            <span class="dropdown-item-text">Einsteiger</span>
+                                            <span class="dropdown-item-desc">Grundlagen, einfache Zahlen</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="fortgeschritten">
+                                            <i class="fas fa-graduation-cap"></i>
+                                            <span class="dropdown-item-text">Fortgeschritten</span>
+                                            <span class="dropdown-item-desc">Standard-Schulaufgaben</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="anspruchsvoll">
+                                            <i class="fas fa-brain"></i>
+                                            <span class="dropdown-item-text">Anspruchsvoll</span>
+                                            <span class="dropdown-item-desc">Komplexere Zusammenhänge</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="experte">
+                                            <i class="fas fa-user-graduate"></i>
+                                            <span class="dropdown-item-text">Experte</span>
+                                            <span class="dropdown-item-desc">Höchstes Niveau</span>
+                                        </div>
+                                        <div class="custom-dropdown-item" data-value="olympiade">
+                                            <i class="fas fa-trophy"></i>
+                                            <span class="dropdown-item-text">Olympiade</span>
+                                            <span class="dropdown-item-desc">Wettbewerbsaufgaben</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Aktuelle Auswahl Anzeige -->
+                            <div class="selection-preview" id="selection-preview">
+                                <span class="preview-label">Auswahl:</span>
+                                <div class="selection-chips" id="selection-chips">
+                                    <span class="chip placeholder">Keine Auswahl - Zufällige Parameter</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Buttons -->
+                            <div class="generation-buttons">
+                                <button class="btn btn-primary" id="generate-btn">
+                                    <i class="fas fa-magic"></i>
+                                    Aufgabe generieren
+                                </button>
+                                <button class="btn btn-accent" id="random-generate-btn" title="Alle Parameter zufällig">
+                                    <i class="fas fa-dice"></i>
+                                    Zufällige Aufgabe
+                                </button>
+                                <button class="btn btn-ghost" id="reset-selection-btn" title="Auswahl zurücksetzen">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Feature Tests Section -->
+                        <div class="test-section">
+                            <h4><i class="fas fa-flask"></i> Feature-Tests</h4>
+                            <p class="test-description">Teste die Fehleranalyse mit vordefinierten Aufgaben und Lösungswegen. Die Aufgabe wird im normalen Workflow angezeigt.</p>
+                            <div class="test-options-row">
+                                <div class="test-option-group">
+                                    <label for="test-solution-type">Lösungsart:</label>
+                                    <select id="test-solution-type" class="select-input">
+                                        <option value="incorrect">Fehlerhafte Lösung</option>
+                                        <option value="correct">Korrekte Lösung</option>
+                                        <option value="random">Zufällig</option>
+                                    </select>
+                                </div>
+                                <div class="test-option-group">
+                                    <label for="test-difficulty-filter">Schwierigkeit:</label>
+                                    <select id="test-difficulty-filter" class="select-input">
+                                        <option value="all">Alle</option>
+                                        <option value="easy">Leicht</option>
+                                        <option value="medium">Mittel</option>
+                                        <option value="hard">Schwer</option>
+                                        <option value="expert">Experte</option>
+                                        <option value="olympiad">Olympiade</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="test-buttons">
+                                <button class="btn btn-secondary" id="run-single-test">
+                                    <i class="fas fa-vial"></i>
+                                    Einzeltest
+                                </button>
+                                <button class="btn btn-secondary" id="run-batch-tests">
+                                    <i class="fas fa-vials"></i>
+                                    Alle Tests
+                                </button>
+                            </div>
+                            <div id="batch-progress"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Profile Tab -->
+                <section class="tab-content" id="user-profile">
+                    <div class="input-container">
+                        <div class="input-header">
+                            <h3>Dein Lernprofil</h3>
+                            <p>Konfiguriere dein Profil für personalisierte Aufgaben und bessere Lernfortschritte:</p>
+                        </div>
+
+                        <!-- Gamification Stats -->
+                        <div class="profile-gamification">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <div class="level-badge large">
+                                        <span id="profile-level">1</span>
+                                    </div>
+                                </div>
+                                <div class="profile-info">
+                                    <div class="profile-name" id="profile-name">Nutzer</div>
+                                    <div class="profile-stats">
+                                        <span>⭐ Level <strong id="profile-level-text">1</strong></span>
+                                        <span>•</span>
+                                        <span>🪙 <strong id="profile-coins">0</strong> Coins</span>
+                                        <span>•</span>
+                                        <span>🔥 <strong id="profile-streak">0</strong> Streak</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- XP Progress -->
+                            <div class="profile-xp">
+                                <div class="xp-label">
+                                    <span>Fortschritt zu Level <span id="profile-next-level">2</span></span>
+                                    <span><span id="profile-current-xp">0</span> / <span id="profile-next-xp">100</span> XP</span>
+                                </div>
+                                <div class="xp-bar large">
+                                    <div class="xp-bar-fill" id="profile-xp-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-form">
+                            <div class="profile-section">
+                                <h4><i class="fas fa-user-graduate"></i> Grundinformationen</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="user-name">Name:</label>
+                                        <input type="text" id="user-name" placeholder="Wird nach dem Login automatisch angezeigt" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-email">E-Mail-Adresse:</label>
+                                        <input type="email" id="user-email" placeholder="Wird nach dem Login automatisch angezeigt" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profile-section">
+                                <h4><i class="fas fa-target"></i> Themenschwerpunkte</h4>
+                                <div class="form-group">
+                                    <label for="weak-topics">Schwache Themen (mehrere möglich):</label>
+                                    <div class="checkbox-group" id="weak-topics">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="functions"> Funktionen
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="integration"> Integration
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="geometry"> Geometrie
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="algebra"> Algebra
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="statistics"> Statistik
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="trigonometry"> Trigonometrie
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profile-section">
+                                <h4><i class="fas fa-cog"></i> Lernpräferenzen</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="learning-style">Lernstil:</label>
+                                        <select id="learning-style">
+                                            <option value="visual">Visuell (Grafiken, Diagramme)</option>
+                                            <option value="step-by-step">Schritt-für-Schritt</option>
+                                            <option value="conceptual">Konzeptuell</option>
+                                            <option value="practical">Praktisch (Beispiele)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- API Konfiguration -->
+                            <div class="profile-section api-config-section">
+                                <h4><i class="fas fa-key"></i> API Konfiguration</h4>
+                                <p class="api-config-hint">
+                                    Für die KI-Funktionen (Aufgaben-Korrektur, Erklärungen) wird ein OpenAI API-Schlüssel benötigt.
+                                    <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">API-Key erstellen</a>
+                                </p>
+                                <div class="form-row">
+                                    <div class="form-group api-key-group">
+                                        <label for="openai-api-key">OpenAI API-Schlüssel:</label>
+                                        <div class="api-key-input-wrapper">
+                                            <input type="password" id="openai-api-key" placeholder="sk-..." autocomplete="off">
+                                            <button type="button" class="btn-icon" id="toggle-api-key-visibility" title="Anzeigen/Verbergen">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <span class="api-key-status" id="api-key-status">Nicht konfiguriert</span>
+                                    </div>
+                                </div>
+                                <div class="api-config-actions">
+                                    <button type="button" class="btn btn-primary" id="save-api-key">
+                                        <i class="fas fa-save"></i> API-Key speichern
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="test-api-key">
+                                        <i class="fas fa-vial"></i> Testen
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="clear-api-key">
+                                        <i class="fas fa-trash"></i> Löschen
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Stärken/Schwächen Dashboard -->
+                            <div class="profile-section strength-weakness-dashboard" id="strength-weakness-section">
+                                <h4><i class="fas fa-chart-line"></i> Dein Lernfortschritt</h4>
+                                <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-4);">
+                                    Basierend auf deinen bisherigen Übungen und Lösungsversuchen:
+                                </p>
+                                
+                                <!-- Loading State -->
+                                <div class="sw-loading" id="sw-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Lade Lernfortschritt...</span>
+                                </div>
+                                
+                                <!-- No Data State -->
+                                <div class="sw-no-data" id="sw-no-data" style="display: none;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Noch nicht genug Daten. Löse einige Aufgaben, um deinen Lernfortschritt zu sehen!</span>
+                                </div>
+                                
+                                <!-- Dashboard Content -->
+                                <div class="sw-content" id="sw-content" style="display: none;">
+                                    <!-- Summary Stats -->
+                                    <div class="sw-summary">
+                                        <div class="sw-stat-card">
+                                            <div class="sw-stat-icon" style="background: var(--success-color);">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                            <div class="sw-stat-info">
+                                                <span class="sw-stat-value" id="sw-tasks-completed">0</span>
+                                                <span class="sw-stat-label">Aufgaben gelöst</span>
+                                            </div>
+                                        </div>
+                                        <div class="sw-stat-card">
+                                            <div class="sw-stat-icon" style="background: var(--primary-color);">
+                                                <i class="fas fa-fire"></i>
+                                            </div>
+                                            <div class="sw-stat-info">
+                                                <span class="sw-stat-value" id="sw-streak">0</span>
+                                                <span class="sw-stat-label">Tage Streak</span>
+                                            </div>
+                                        </div>
+                                        <div class="sw-stat-card">
+                                            <div class="sw-stat-icon" style="background: var(--warning-color);">
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                            <div class="sw-stat-info">
+                                                <span class="sw-stat-value" id="sw-avg-rating">-</span>
+                                                <span class="sw-stat-label">Durchschnitt</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Strengths Section -->
+                                    <div class="sw-section">
+                                        <h5><i class="fas fa-thumbs-up"></i> Deine Stärken</h5>
+                                        <div class="sw-competency-list" id="sw-strengths">
+                                            <div class="sw-empty">Noch keine Stärken identifiziert</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Weaknesses Section -->
+                                    <div class="sw-section">
+                                        <h5><i class="fas fa-thumbs-down"></i> Verbesserungspotential</h5>
+                                        <div class="sw-competency-list" id="sw-weaknesses">
+                                            <div class="sw-empty">Noch keine Schwächen identifiziert</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Error Balance Section -->
+                                    <div class="sw-section">
+                                        <h5><i class="fas fa-exclamation-triangle"></i> Fehlerbilanzen</h5>
+                                        <div class="sw-error-grid" id="sw-errors">
+                                            <div class="sw-error-item">
+                                                <span class="sw-error-type" style="background: var(--error-logic-color);">Logik</span>
+                                                <span class="sw-error-count" id="sw-error-logic">0</span>
+                                            </div>
+                                            <div class="sw-error-item">
+                                                <span class="sw-error-type" style="background: var(--error-calc-color);">Rechnung</span>
+                                                <span class="sw-error-count" id="sw-error-calc">0</span>
+                                            </div>
+                                            <div class="sw-error-item">
+                                                <span class="sw-error-type" style="background: var(--error-followup-color);">Folge</span>
+                                                <span class="sw-error-count" id="sw-error-followup">0</span>
+                                            </div>
+                                            <div class="sw-error-item">
+                                                <span class="sw-error-type" style="background: var(--error-formal-color);">Formal</span>
+                                                <span class="sw-error-count" id="sw-error-formal">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Suggestions Section -->
+                                    <div class="sw-section">
+                                        <h5><i class="fas fa-lightbulb"></i> Empfehlungen</h5>
+                                        <div class="sw-suggestions" id="sw-suggestions">
+                                            <div class="sw-empty">Löse mehr Aufgaben für personalisierte Empfehlungen</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Refresh Button -->
+                                <div class="sw-actions">
+                                    <button class="btn btn-secondary" id="sw-refresh">
+                                        <i class="fas fa-sync-alt"></i>
+                                        Aktualisieren
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="profile-actions">
+                                <button class="btn btn-primary" id="save-profile">
+                                    <i class="fas fa-save"></i>
+                                    Profil speichern
+                                </button>
+                                <button class="btn btn-secondary" id="reset-profile">
+                                    <i class="fas fa-undo"></i>
+                                    Zurücksetzen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Task Upload Section -->
+                <section class="tab-content" id="task-upload">
+                    <div class="input-container">
+                        <div class="input-header">
+                            <h3><i class="fas fa-upload"></i> Aufgabe hochladen</h3>
+                            <p>Lade eine Aufgabe als Bild oder Text hoch und lass sie von der KI bewerten</p>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="upload-tabs">
+                            <button class="upload-tab active" data-tab="image">
+                                <i class="fas fa-image"></i> Bild
+                            </button>
+                            <button class="upload-tab" data-tab="text">
+                                <i class="fas fa-text"></i> Text
+                            </button>
+                        </div>
+
+                        <!-- Bild Upload Tab -->
+                        <div class="upload-tab-content active" id="image-upload-tab">
+                            <div class="drop-zone" id="task-drop-zone">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Ziehe ein Bild hierher oder klicke zum Auswählen</p>
+                                <p class="drop-zone-hint">Unterstützte Formate: JPG, PNG, PDF (max. 10MB)</p>
+                                <input type="file" id="task-image-input" accept="image/*,application/pdf" hidden>
+                            </div>
+                            <div class="image-preview" id="task-image-preview" style="display: none;">
+                                <img id="task-preview-img" alt="Aufgaben-Vorschau">
+                                <button class="btn btn-secondary btn-sm" id="clear-task-image">
+                                    <i class="fas fa-times"></i> Entfernen
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Text Upload Tab -->
+                        <div class="upload-tab-content" id="text-upload-tab">
+                            <textarea id="task-text-input" placeholder="Gib hier die Aufgabe ein...&#10;&#10;Beispiel:&#10;Berechne die Ableitung von f(x) = x³ + 2x² - 5x + 3"></textarea>
+                        </div>
+
+                        <!-- Metadata -->
+                        <div class="task-metadata">
+                            <div class="form-group">
+                                <label for="task-subject-select">
+                                    <i class="fas fa-book"></i> Fach (optional):
+                                </label>
+                                <select id="task-subject-select" class="form-select">
+                                    <option value="1">Mathematik</option>
+                                    <option value="2">Physik</option>
+                                    <option value="3">Chemie</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task-topic-input">
+                                    <i class="fas fa-tag"></i> Thema (optional):
+                                </label>
+                                <input type="text" id="task-topic-input" class="form-input" placeholder="z.B. Integralrechnung">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg" id="submit-task-upload">
+                            <i class="fas fa-upload"></i> Aufgabe hochladen
+                        </button>
+                    </div>
+                </section>
+
+                <!-- My Tasks Section -->
+                <section class="tab-content" id="my-tasks">
+                    <div class="tasks-header">
+                        <h3><i class="fas fa-tasks"></i> Meine Aufgaben</h3>
+                        <div class="tasks-stats">
+                            <span id="tasks-count">0 Aufgaben</span>
+                        </div>
+                    </div>
+
+                    <div class="tasks-filters">
+                        <select id="task-status-filter" class="form-select">
+                            <option value="all">Alle Status</option>
+                            <option value="ready">Bereit</option>
+                            <option value="in-progress">In Bearbeitung</option>
+                            <option value="solved">Gelöst</option>
+                        </select>
+
+                        <select id="task-subject-filter" class="form-select">
+                            <option value="all">Alle Fächer</option>
+                            <option value="1">Mathematik</option>
+                            <option value="2">Physik</option>
+                            <option value="3">Chemie</option>
+                        </select>
+                    </div>
+
+                    <div class="tasks-grid" id="tasks-list">
+                        <!-- Task Cards dynamisch generiert -->
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Noch keine Aufgaben vorhanden</p>
+                            <a href="#" class="btn btn-primary" data-section="task-upload">
+                                <i class="fas fa-plus"></i> Erste Aufgabe hochladen
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Task Solve Section -->
+                <section class="tab-content" id="task-solve">
+                    <div class="task-solve-header">
+                        <button class="btn btn-secondary" id="back-to-tasks">
+                            <i class="fas fa-arrow-left"></i> Zurück
+                        </button>
+                        <h3 id="task-solve-title">Aufgabe lösen</h3>
+                    </div>
+
+                    <div class="task-solve-container">
+                        <div class="task-display" id="task-display">
+                            <!-- Aufgabeninhalt (Bild oder Text) -->
+                        </div>
+
+                        <div class="task-answer-section">
+                            <h4><i class="fas fa-pencil-alt"></i> Deine Lösung</h4>
+                            <textarea id="task-answer-input" placeholder="Gib hier deine Lösung ein...&#10;&#10;Erkläre deinen Lösungsweg Schritt für Schritt."></textarea>
+
+                            <div class="task-actions">
+                                <button class="btn btn-primary btn-lg" id="submit-task-answer">
+                                    <i class="fas fa-check"></i> Lösung einreichen
+                                </button>
+                                <button class="btn btn-hint" id="task-hint-btn">
+                                    <i class="fas fa-lightbulb"></i> Tipp anfordern
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="task-feedback" id="task-feedback-display" style="display: none;">
+                            <!-- KI-Feedback hier -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Achievements Section -->
+                <section class="tab-content" id="achievements">
+                    <div class="achievements-header">
+                        <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                        <div class="achievements-progress">
+                            <span id="achievements-count">0/30</span> freigeschaltet
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="achievements-progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievements-categories">
+                        <button class="category-btn active" data-category="all">Alle</button>
+                        <button class="category-btn" data-category="level">Level</button>
+                        <button class="category-btn" data-category="tasks">Aufgaben</button>
+                        <button class="category-btn" data-category="coins">Coins</button>
+                        <button class="category-btn" data-category="streak">Streak</button>
+                        <button class="category-btn" data-category="subject">Fächer</button>
+                        <button class="category-btn" data-category="special">Spezial</button>
+                    </div>
+
+                    <div class="achievements-grid" id="achievements-list">
+                        <!-- Achievements dynamisch generiert -->
+                    </div>
+                </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="results-container">
+                    <div class="results-header">
+                        <h3>KI-Analyse Ergebnis</h3>
+                        <button class="btn btn-secondary" id="close-results">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="results-content" id="results-content">
+                        <!-- KI-Antworten werden hier angezeigt -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div class="loading-indicator" id="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>KI analysiert deine Eingabe...</p>
+            </div>
+
+            <!-- Tutor View Demo Section (Dev/Test) -->
+            <section class="tutor-view-demo-section" id="tutor-view-demo-section" style="display: none;">
+                <h3><i class="fas fa-flask"></i> Tutor Output Demo</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-4);">
+                    Demo-Ansicht für strukturiertes KI-Feedback mit Schritten, Info-Boxen und Hint-Chips.
+                </p>
+                <div id="tutor-view-demo"></div>
+                <div style="margin-top: var(--spacing-4);">
+                    <button class="btn btn-secondary" id="toggle-tutor-demo">
+                        <i class="fas fa-eye-slash"></i> Demo ausblenden
+                    </button>
+                </div>
+            </section>
+            </div><!-- End of content-area -->
+        </main>
+        
+        <!-- Bottom Bar (context-dependent actions) -->
+        <div class="bottom-bar" id="bottom-bar">
+            <!-- Will be dynamically populated based on context -->
+        </div>
+    </div><!-- End of app-layout -->
+
+    <!-- Tutor Output Model & View -->
+    <script src="tutor-model.js"></script>
+    <script src="tutor-view.js"></script>
+
+    <!-- Task Upload System -->
+    <script src="js/ai-task-validator.js"></script>
+    <script src="js/task-upload.js"></script>
+
+    <!-- Achievements System -->
+    <script src="js/achievements.js"></script>
+    <script src="js/achievements-ui.js"></script>
+
+    <script src="script.js?v=12"></script>
+    
+    <!-- Splash Animation (loaded last to ensure DOM is ready) -->
+    <script src="splash-animation.js"></script>
+</body>
+</html>
