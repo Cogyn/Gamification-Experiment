@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cogyn - Adaptive Lernplattform</title>
     <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Authentication Check - Must be first -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('cogyn_token');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        })();
+    </script>
+
     <link rel="stylesheet" href="styles.css?v=5">
     <link rel="stylesheet" href="splash-animation.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -1210,7 +1221,19 @@
                                     <i class="fas fa-undo"></i>
                                     Zurücksetzen
                                 </button>
+                                <button class="btn btn-danger" id="logout-btn" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Abmelden
+                                </button>
                             </div>
+
+                            <script>
+                                function logout() {
+                                    localStorage.removeItem('cogyn_token');
+                                    localStorage.removeItem('cogyn_user');
+                                    window.location.href = '/login.html';
+                                }
+                            </script>
                         </div>
                     </div>
                 </section>
