@@ -12,13 +12,13 @@
     # API routes go to Laravel
     RewriteRule ^api/ index.php [L]
 
-    # For the root path, serve index.html
-    RewriteRule ^$ index.html [L]
+    # For the root path, serve login.html (auth check happens there)
+    RewriteRule ^$ login.html [L]
 
-    # For all other non-file requests, try index.html first (SPA routing)
+    # For all other non-file requests, serve login.html
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.html [L]
+    RewriteRule ^ login.html [L]
 </IfModule>
 
 # Set correct MIME types
