@@ -2,8 +2,8 @@ name: Generate composer.lock
 
 on:
   push:
-    paths:
-      - 'composer.json'
+    branches:
+      - main
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
