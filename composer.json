@@ -49,10 +49,7 @@
         ],
         "post-install-cmd": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-            "@php artisan key:generate --ansi --force || true",
-            "@php artisan config:cache || true",
-            "@php artisan route:cache || true",
-            "@php artisan view:cache || true"
+            "@php artisan key:generate --ansi --force || true"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
