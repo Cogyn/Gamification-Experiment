@@ -526,37 +526,6 @@
                     </div>
                 </div>
                 
-                <!-- Error Stats Widget -->
-                <div class="error-stats">
-                    <h4>Fehler heute</h4>
-                    <div class="stat-grid">
-                        <div class="stat-item stat-logic">
-                            <span class="stat-count" id="stat-logic">0</span>
-                            <span class="stat-label">Logik</span>
-                        </div>
-                        <div class="stat-item stat-calc">
-                            <span class="stat-count" id="stat-calc">0</span>
-                            <span class="stat-label">Rechnung</span>
-                        </div>
-                        <div class="stat-item stat-followup">
-                            <span class="stat-count" id="stat-followup">0</span>
-                            <span class="stat-label">Folge</span>
-                        </div>
-                        <div class="stat-item stat-formal">
-                            <span class="stat-count" id="stat-formal">0</span>
-                            <span class="stat-label">Formal</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Recommendations Widget -->
-                <div class="recommendations" id="recommendations-widget">
-                    <h4>Empfehlungen</h4>
-                    <div class="recommendation-item">
-                        <i class="fas fa-lightbulb"></i>
-                        <span>Starte mit einer Übungsaufgabe</span>
-                    </div>
-                </div>
             </div>
             <div class="sidebar-footer">
                 <a href="#" class="nav-item" data-section="user-profile">
@@ -1282,7 +1251,7 @@
 
                         <!-- Text Upload Tab -->
                         <div class="upload-tab-content" id="text-upload-tab">
-                            <textarea id="task-text-input" placeholder="Gib hier die Aufgabe ein...&#10;&#10;Beispiel:&#10;Berechne die Ableitung von f(x) = x³ + 2x² - 5x + 3"></textarea>
+                            <textarea id="task-text-input" class="task-textarea-large" placeholder="Gib hier die Aufgabe ein...&#10;&#10;Beispiel:&#10;Berechne die Ableitung von f(x) = x³ + 2x² - 5x + 3&#10;&#10;Du kannst auch mehrere Teilaufgaben eingeben:&#10;a) Bestimme die Nullstellen&#10;b) Berechne die Extrempunkte&#10;c) Skizziere den Graphen"></textarea>
                         </div>
 
                         <!-- Metadata -->
@@ -1316,8 +1285,11 @@
                 <section class="tab-content" id="my-tasks">
                     <div class="tasks-header">
                         <h3><i class="fas fa-tasks"></i> Meine Aufgaben</h3>
-                        <div class="tasks-stats">
-                            <span id="tasks-count">0 Aufgaben</span>
+                        <div class="tasks-header-actions">
+                            <span id="tasks-count" class="tasks-stats">0 Aufgaben</span>
+                            <a href="#" class="btn btn-primary" data-section="task-upload">
+                                <i class="fas fa-plus"></i> Aufgabe hochladen
+                            </a>
                         </div>
                     </div>
 

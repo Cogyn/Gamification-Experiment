@@ -49,7 +49,9 @@
         ],
         "post-install-cmd": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php -r \"if (!file_exists('database/database.sqlite')) { touch('database/database.sqlite'); }\"",
             "@php artisan key:generate --ansi --force || true",
+            "@php artisan migrate --force || true",
             "@php artisan config:cache || true",
             "@php artisan route:cache || true",
             "@php artisan view:cache || true"
