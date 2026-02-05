@@ -1,0 +1,44 @@
+name: Generate composer.lock
+
+on:
+  push:
+    paths:
+      - 'composer.json'
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  update-lock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: bcmath, ctype, curl, dom, fileinfo, json, mbstring, openssl, pdo, pdo_sqlite, tokenizer, xml
+          tools: composer:v2
+
+      - name: Remove old lock file
+        run: rm -f composer.lock
+
+      - name: Generate composer.lock
+        run: composer update --no-scripts --no-interaction --prefer-dist
+        env:
+          COMPOSER_MEMORY_LIMIT: -1
+
+      - name: Commit composer.lock
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add composer.lock
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update composer.lock [skip ci]"
+            git push
+          fi
