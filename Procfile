@@ -1,1 +1,1 @@
-web: vendor/bin/heroku-php-nginx -C docker/default.conf
+web: vendor/bin/heroku-php-apache2 public/

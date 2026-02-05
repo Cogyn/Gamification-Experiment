@@ -1,44 +1,70 @@
-# OS files
+# ===== VENDOR & DEPENDENCIES =====
+# WICHTIG: Diese werden beim Build auf Koyeb installiert
+/vendor/
+/node_modules/
+
+# ===== ENVIRONMENT =====
+# Niemals committen! Enthält Secrets wie APP_KEY, API Keys etc.
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+
+# ===== LARAVEL CACHE & STORAGE =====
+# Wird zur Laufzeit generiert
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/.gitkeep
+!/storage/framework/cache/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep
+!/storage/logs/.gitkeep
+
+# Bootstrap Cache
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# ===== DATABASE =====
+# SQLite DB wird zur Laufzeit erstellt
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# ===== COMPILED ASSETS =====
+# Wird beim Build von Vite generiert
+/public/build/
+/public/hot
+/public/storage
+
+# ===== SENSITIVE CONFIG =====
+config/aws-config.js
+*.pem
+*.key
+
+# ===== OS FILES =====
 .DS_Store
 Thumbs.db
-
-# IDE
-.idea/
-.vscode/
 *.swp
 *.swo
+*~
 
-# Dependencies
-node_modules/
-/vendor/
+# ===== IDE =====
+/.idea/
+/.vscode/
+*.sublime-project
+*.sublime-workspace
 
-# Sensitive files
-.env
-.env.local
-.env.production
-config/aws-config.js
+# ===== TESTING =====
+/.phpunit.cache/
+/coverage/
 
-# Backups
-server-download-backup/
-*.bak
-
-# Logs
+# ===== MISC =====
 *.log
-storage/logs/*.log
-
-# Laravel cache
-bootstrap/cache/*.php
-storage/framework/cache/*
-storage/framework/sessions/*
-storage/framework/views/*
-!storage/framework/.gitkeep
-!storage/framework/cache/.gitkeep
-!storage/framework/sessions/.gitkeep
-!storage/framework/views/.gitkeep
-
-# Database
-database/*.sqlite
-
-# Compiled assets
-public/build/
-public/hot
+*.bak
+server-download-backup/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

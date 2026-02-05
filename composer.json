@@ -5,7 +5,19 @@
     "keywords": ["laravel", "education", "gamification", "ai"],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
+        "ext-bcmath": "*",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-fileinfo": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-tokenizer": "*",
+        "ext-xml": "*",
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.3",
@@ -14,11 +26,9 @@
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^7.10",
-        "phpunit/phpunit": "^10.5",
-        "spatie/laravel-ignition": "^2.4"
+        "phpunit/phpunit": "^10.5"
     },
     "autoload": {
         "psr-4": {
@@ -37,6 +47,13 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
+        "post-install-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate --ansi --force || true",
+            "@php artisan config:cache || true",
+            "@php artisan route:cache || true",
+            "@php artisan view:cache || true"
+        ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
@@ -45,6 +62,11 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "compile": [
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache"
         ]
     },
     "extra": {
@@ -59,7 +81,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        }
+        },
+        "platform-check": false,
+        "process-timeout": 0
     },
     "minimum-stability": "stable",
     "prefer-stable": true
