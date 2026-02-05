@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgaben - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link active">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Aufgaben</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Filters -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-content">
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 200px;">
+              <input
+                type="text"
+                id="search-input"
+                class="form-input"
+                placeholder="🔍 Suchen..."
+              >
+            </div>
+
+            <select id="subject-filter" class="form-select" style="min-width: 150px;">
+              <option value="">Alle Fächer</option>
+            </select>
+
+            <select id="status-filter" class="form-select" style="min-width: 150px;">
+              <option value="">Alle Status</option>
+              <option value="ready">Bereit</option>
+              <option value="solved">Gelöst</option>
+              <option value="pending">Wartend</option>
+            </select>
+
+            <select id="difficulty-filter" class="form-select" style="min-width: 150px;">
+              <option value="">Alle Schwierigkeiten</option>
+              <option value="1">⭐ Sehr Leicht (1-2)</option>
+              <option value="3">⭐⭐ Leicht (3-4)</option>
+              <option value="5">⭐⭐⭐ Mittel (5-6)</option>
+              <option value="7">⭐⭐⭐⭐ Schwer (7-8)</option>
+              <option value="9">⭐⭐⭐⭐⭐ Sehr Schwer (9-10)</option>
+            </select>
+
+            <button id="clear-filters" class="btn btn-secondary btn-sm">
+              <i class="fas fa-times"></i> Filter zurücksetzen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks List -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span id="task-count">0</span> Aufgaben
+          </h2>
+          <a href="task-upload.html" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Neue Aufgabe
+          </a>
+        </div>
+        <div class="card-content">
+          <ul class="task-list" id="tasks-list">
+            <!-- Tasks will be populated by JS -->
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link active">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let currentFilters = {};
+
+    function displayTasks() {
+      const tasksListEl = document.getElementById('tasks-list');
+      const taskCountEl = document.getElementById('task-count');
+
+      const tasks = filterTasks(currentFilters);
+
+      taskCountEl.textContent = tasks.length;
+
+      if (tasks.length === 0) {
+        tasksListEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <div class="empty-state-text">Keine Aufgaben gefunden</div>
+            <a href="task-upload.html" class="btn btn-primary">
+              <i class="fas fa-upload"></i> Neue Aufgabe erstellen
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      let tasksHTML = '';
+
+      tasks.forEach(task => {
+        tasksHTML += `
+          <li class="task-item" onclick="window.location.href='task-solve.html?id=${task.id}'">
+            <div class="task-header">
+              <div class="task-meta">
+                ${getSubjectBadgeHTML(task.subjectId)}
+                ${getStatusBadgeHTML(task.status)}
+              </div>
+              <div style="text-align: right;">
+                ${getDifficultyStars(task.difficulty)}
+              </div>
+            </div>
+            <div class="task-content">${task.rawContent}</div>
+            <div class="task-footer">
+              <span><i class="fas fa-tag"></i> ${task.topic}</span>
+              <span><i class="fas fa-calendar"></i> ${formatDate(task.createdAt)}</span>
+              <span>⭐ ${task.xpReward} XP</span>
+            </div>
+          </li>
+        `;
+      });
+
+      tasksListEl.innerHTML = tasksHTML;
+
+      // Render LaTeX
+      setTimeout(() => {
+        if (window.renderMathInElement) {
+          renderMathInElement(tasksListEl, {
+            delimiters: [
+              {left: '\\[', right: '\\]', display: true},
+              {left: '\\(', right: '\\)', display: false}
+            ]
+          });
+        }
+      }, 100);
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('search-input').value.trim();
+      const subjectId = document.getElementById('subject-filter').value;
+      const status = document.getElementById('status-filter').value;
+      const difficulty = document.getElementById('difficulty-filter').value;
+
+      currentFilters = {};
+
+      if (search) currentFilters.search = search;
+      if (subjectId) currentFilters.subjectId = parseInt(subjectId);
+      if (status) currentFilters.status = status;
+      if (difficulty) {
+        const diffValue = parseInt(difficulty);
+        currentFilters.difficulty = diffValue;
+      }
+
+      displayTasks();
+    }
+
+    function clearFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('subject-filter').value = '';
+      document.getElementById('status-filter').value = '';
+      document.getElementById('difficulty-filter').value = '';
+      currentFilters = {};
+      displayTasks();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Populate subject filter
+      const subjectFilter = document.getElementById('subject-filter');
+      CONFIG.subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject.id;
+        option.textContent = `${subject.icon} ${subject.name}`;
+        subjectFilter.appendChild(option);
+      });
+
+      // Setup filter event listeners
+      document.getElementById('search-input').addEventListener('input', applyFilters);
+      document.getElementById('subject-filter').addEventListener('change', applyFilters);
+      document.getElementById('status-filter').addEventListener('change', applyFilters);
+      document.getElementById('difficulty-filter').addEventListener('change', applyFilters);
+      document.getElementById('clear-filters').addEventListener('click', clearFilters);
+
+      // Initial display
+      displayTasks();
+    });
+  </script>
+</body>
+</html>

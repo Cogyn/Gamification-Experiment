@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link active">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Profil</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Profile Content -->
+      <div class="grid grid-2">
+        <!-- User Info Card -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-content">
+            <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+              <div class="level-badge" style="width: 6rem; height: 6rem; font-size: 2.5rem;">
+                <span class="level-number" id="profile-level"></span>
+              </div>
+              <div style="flex: 1;">
+                <h2 style="font-size: 2rem; margin-bottom: 0.5rem;" id="profile-name"></h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;" id="profile-email"></p>
+                <div class="xp-bar" style="max-width: 500px;">
+                  <div class="xp-bar-fill" id="profile-xp-bar"></div>
+                </div>
+                <div class="xp-bar-text" id="profile-xp-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Statistiken</h2>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;" id="profile-stats">
+              <!-- Stats will be populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Erfolge</h2>
+          </div>
+          <div class="card-content">
+            <div class="empty-state" style="padding: 2rem 1rem;">
+              <div class="empty-state-icon">🏆</div>
+              <p style="color: var(--text-secondary);">Erfolge kommen bald!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Mastery Detail -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h2 class="card-title">Fächer-Meisterschaft</h2>
+          </div>
+          <div class="card-content">
+            <div class="grid grid-2" id="subject-mastery-detail">
+              <!-- Subject mastery will be populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- API Key Settings -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i class="fas fa-key"></i> API Einstellungen
+            </h2>
+          </div>
+          <div class="card-content">
+            <div id="api-key-status" style="margin-bottom: 1.5rem;"></div>
+
+            <div class="form-group">
+              <label class="form-label" for="api-key-input">
+                OpenAI API Key (GPT-5.1)
+              </label>
+              <div style="display: flex; gap: 1rem;">
+                <input
+                  type="password"
+                  id="api-key-input"
+                  class="form-input"
+                  placeholder="sk-..."
+                  style="flex: 1;"
+                >
+                <button type="button" class="btn btn-primary" onclick="handleSaveApiKey()">
+                  <i class="fas fa-save"></i> Speichern
+                </button>
+              </div>
+              <div class="form-helper">
+                Dein API Key wird lokal im Browser gespeichert und nur für KI-Features verwendet.
+                <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--primary); text-decoration: underline;">
+                  API Key erstellen
+                </a>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+              <button type="button" class="btn btn-sm btn-secondary" onclick="toggleApiKeyVisibility()">
+                <i class="fas fa-eye" id="toggle-icon"></i> <span id="toggle-text">Anzeigen</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="handleClearApiKey()">
+                <i class="fas fa-trash"></i> API Key löschen
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h2 class="card-title">Einstellungen</h2>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button class="btn btn-danger" onclick="handleDataReset()">
+                <i class="fas fa-trash"></i> Alle Daten zurücksetzen
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link active">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/ai-service.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    function handleSaveApiKey() {
+      const input = document.getElementById('api-key-input');
+      const key = input.value.trim();
+
+      if (!key) {
+        showToast('Bitte API Key eingeben', 'error');
+        return;
+      }
+
+      if (!key.startsWith('sk-')) {
+        showToast('Ungültiger API Key Format. Sollte mit "sk-" beginnen.', 'error');
+        return;
+      }
+
+      try {
+        setApiKey(key);
+        showToast('API Key erfolgreich gespeichert!', 'success');
+        updateApiKeyStatus();
+        input.value = '';
+      } catch (error) {
+        showToast('Fehler beim Speichern: ' + error.message, 'error');
+      }
+    }
+
+    function handleClearApiKey() {
+      confirm('API Key wirklich löschen?', (confirmed) => {
+        if (confirmed) {
+          clearApiKey();
+          showToast('API Key gelöscht', 'success');
+          updateApiKeyStatus();
+          document.getElementById('api-key-input').value = '';
+        }
+      });
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('api-key-input');
+      const icon = document.getElementById('toggle-icon');
+      const text = document.getElementById('toggle-text');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (hasApiKey()) {
+          input.value = getApiKey();
+        }
+        icon.className = 'fas fa-eye-slash';
+        text.textContent = 'Verbergen';
+      } else {
+        input.type = 'password';
+        input.value = '';
+        icon.className = 'fas fa-eye';
+        text.textContent = 'Anzeigen';
+      }
+    }
+
+    function updateApiKeyStatus() {
+      const statusEl = document.getElementById('api-key-status');
+
+      if (hasApiKey()) {
+        const key = getApiKey();
+        const masked = key.substring(0, 12) + '...' + key.substring(key.length - 4);
+        statusEl.innerHTML = `
+          <div style="padding: 1rem; background: var(--success)20; border-left: 4px solid var(--success); border-radius: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+              <i class="fas fa-check-circle"></i>
+              <strong>API Key gespeichert</strong>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem; font-family: monospace;">
+              ${masked}
+            </div>
+          </div>
+        `;
+      } else {
+        statusEl.innerHTML = `
+          <div style="padding: 1rem; background: var(--accent)20; border-left: 4px solid var(--accent); border-radius: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--accent);">
+              <i class="fas fa-exclamation-triangle"></i>
+              <strong>Kein API Key gespeichert</strong>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.5rem;">
+              Bitte API Key eingeben, um KI-Features zu nutzen (Bild-Upload, automatische Lösungsprüfung)
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function handleDataReset() {
+      confirm('Möchtest du wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.', (confirmed) => {
+        if (confirmed) {
+          clearAllData();
+          clearApiKey();
+          showToast('Alle Daten wurden zurückgesetzt', 'success');
+          setTimeout(() => window.location.reload(), 1000);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateApiKeyStatus();
+      const user = getUserData();
+      const tasks = getAllTasks();
+      const solvedTasks = tasks.filter(t => t.status === 'solved');
+
+      // User Info
+      document.getElementById('profile-level').textContent = user.level;
+      document.getElementById('profile-name').textContent = user.name;
+      document.getElementById('profile-email').textContent = user.email;
+
+      const progress = getLevelProgress(user);
+      document.getElementById('profile-xp-bar').style.width = progress + '%';
+      document.getElementById('profile-xp-text').textContent =
+        `${user.xp} / ${getXPForNextLevel(user.level) - getXPForCurrentLevel(user.level)} XP bis Level ${user.level + 1}`;
+
+      // Statistics
+      const statsEl = document.getElementById('profile-stats');
+      statsEl.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-trophy" style="color: var(--accent);"></i>
+            <span>Gesamtpunkte</span>
+          </span>
+          <strong>${user.xp + getXPForCurrentLevel(user.level)}</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-check-circle" style="color: var(--success);"></i>
+            <span>Gelöste Aufgaben</span>
+          </span>
+          <strong>${solvedTasks.length}</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-upload" style="color: var(--primary);"></i>
+            <span>Hochgeladene Aufgaben</span>
+          </span>
+          <strong>${tasks.length}</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-fire" style="color: var(--accent);"></i>
+            <span>Aktuelle Streak</span>
+          </span>
+          <strong>${user.currentStreak} Tage</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-award" style="color: var(--accent);"></i>
+            <span>Längste Streak</span>
+          </span>
+          <strong>${user.longestStreak} Tage</strong>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem;">
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-coins" style="color: var(--accent);"></i>
+            <span>Brain Coins</span>
+          </span>
+          <strong>${user.coins}</strong>
+        </div>
+      `;
+
+      // Subject Mastery Detail
+      const masteryEl = document.getElementById('subject-mastery-detail');
+      const masteryEntries = Object.entries(user.subjectMastery);
+
+      if (masteryEntries.length === 0) {
+        masteryEl.innerHTML = `
+          <div class="empty-state" style="grid-column: span 2; padding: 3rem 1rem;">
+            <div class="empty-state-icon">📚</div>
+            <p style="color: var(--text-secondary);">Löse Aufgaben, um Fächer-Meisterschaft zu sammeln!</p>
+          </div>
+        `;
+      } else {
+        let masteryHTML = '';
+
+        masteryEntries.forEach(([slug, data]) => {
+          const subject = CONFIG.subjects.find(s => s.slug === slug);
+          if (subject) {
+            const masteryProgress = (data.xp / (data.level * 500)) * 100;
+            masteryHTML += `
+              <div class="card">
+                <div class="card-content">
+                  <div style="text-align: center; margin-bottom: 1rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">${subject.icon}</div>
+                    <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;">${subject.name}</h3>
+                    <div class="level-badge level-badge-small" style="margin: 0 auto;">
+                      <span class="level-number">${data.level}</span>
+                    </div>
+                  </div>
+
+                  <div class="xp-bar" style="height: 0.75rem; margin-bottom: 0.5rem;">
+                    <div class="xp-bar-fill" style="width: ${masteryProgress}%; background: ${subject.color};"></div>
+                  </div>
+                  <div style="font-size: 0.875rem; color: var(--text-secondary); text-align: center;">
+                    ${data.xp} / ${data.level * 500} XP
+                  </div>
+
+                  <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center;">
+                    <strong style="color: ${subject.color};">${data.tasksCompleted}</strong>
+                    <span style="color: var(--text-secondary);"> Aufgaben gelöst</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        masteryEl.innerHTML = masteryHTML;
+      }
+    });
+  </script>
+</body>
+</html>

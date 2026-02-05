@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe Hochladen - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    .file-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 1rem;
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: var(--bg-tertiary);
+    }
+
+    .file-upload-area:hover {
+      border-color: var(--primary);
+      background: var(--bg-secondary);
+    }
+
+    .file-upload-area.drag-over {
+      border-color: var(--accent);
+      background: var(--primary)10;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link active">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Aufgabe hochladen</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Upload Form -->
+      <div class="card" style="max-width: 900px; margin: 0 auto;">
+        <div class="card-header">
+          <h2 class="card-title">Neue Mathematik-Aufgabe</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="tab-image" class="btn btn-sm btn-primary">
+              <i class="fas fa-image"></i> Bild
+            </button>
+            <button id="tab-text" class="btn btn-sm btn-secondary">
+              <i class="fas fa-keyboard"></i> Text
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <form id="task-upload-form">
+            <!-- Image Upload Tab -->
+            <div id="image-upload-section">
+              <div class="file-upload-area" id="file-upload-area">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Bild hochladen oder hierher ziehen</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                  JPG, PNG oder PDF (max 10MB)
+                </p>
+                <input type="file" id="file-input" accept="image/*,application/pdf" style="display: none;">
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+                  <i class="fas fa-folder-open"></i> Datei auswählen
+                </button>
+              </div>
+
+              <div id="image-preview" style="display: none; margin-top: 1.5rem;">
+                <h3 style="font-weight: bold; margin-bottom: 0.5rem;">Vorschau:</h3>
+                <img id="preview-img" class="preview-image" alt="Preview">
+                <button type="button" class="btn btn-sm btn-secondary" style="margin-top: 1rem;" onclick="clearImageUpload()">
+                  <i class="fas fa-times"></i> Entfernen
+                </button>
+              </div>
+            </div>
+
+            <!-- Text Input Tab -->
+            <div id="text-input-section" style="display: none;">
+              <div class="form-group">
+                <label class="form-label" for="text-content">
+                  <i class="fas fa-pen"></i> Aufgabenstellung
+                </label>
+                <textarea
+                  id="text-content"
+                  class="form-textarea"
+                  placeholder="Gib die Mathematik-Aufgabe ein...&#10;&#10;Beispiel:&#10;Löse die Gleichung: 2x + 5 = 15"
+                  rows="8"
+                ></textarea>
+                <div class="form-helper">
+                  Die KI wird später beim Lösen die Antwort überprüfen.
+                </div>
+              </div>
+            </div>
+
+            <!-- Common Fields -->
+            <div class="form-group" style="margin-top: 2rem;">
+              <label class="form-label" for="topic">
+                <i class="fas fa-tag"></i> Thema (Optional)
+              </label>
+              <input
+                type="text"
+                id="topic"
+                class="form-input"
+                placeholder="z.B. Algebra, Geometrie, Analysis..."
+              >
+              <div class="form-helper">
+                Hilft dir beim Organisieren deiner Aufgaben
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+              <button type="submit" class="btn btn-success btn-lg" style="flex: 1;">
+                <i class="fas fa-save"></i> Aufgabe speichern
+              </button>
+              <a href="dashboard.html" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Abbrechen
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="card" style="max-width: 900px; margin: 2rem auto 0; background: var(--primary)10; border-left: 4px solid var(--primary);">
+        <div class="card-content">
+          <div style="display: flex; gap: 1rem; align-items: start;">
+            <i class="fas fa-info-circle" style="font-size: 1.5rem; color: var(--primary); margin-top: 0.25rem;"></i>
+            <div>
+              <h3 style="font-weight: bold; margin-bottom: 0.5rem; color: var(--primary);">Wie funktioniert's?</h3>
+              <ol style="color: var(--text-secondary); padding-left: 1.25rem;">
+                <li>Lade ein Bild der Aufgabe hoch oder gib sie als Text ein</li>
+                <li>Gib optional ein Thema an (z.B. "Algebra")</li>
+                <li>Speichere die Aufgabe</li>
+                <li>Beim Lösen prüft die KI automatisch deine Antwort!</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link active">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/ai-service.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let currentFile = null;
+    let currentFileData = null;
+    let currentMode = 'image';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching
+      document.getElementById('tab-image').addEventListener('click', function() {
+        currentMode = 'image';
+        document.getElementById('image-upload-section').style.display = 'block';
+        document.getElementById('text-input-section').style.display = 'none';
+        this.classList.remove('btn-secondary');
+        this.classList.add('btn-primary');
+        document.getElementById('tab-text').classList.remove('btn-primary');
+        document.getElementById('tab-text').classList.add('btn-secondary');
+      });
+
+      document.getElementById('tab-text').addEventListener('click', function() {
+        currentMode = 'text';
+        document.getElementById('image-upload-section').style.display = 'none';
+        document.getElementById('text-input-section').style.display = 'block';
+        this.classList.remove('btn-secondary');
+        this.classList.add('btn-primary');
+        document.getElementById('tab-image').classList.remove('btn-primary');
+        document.getElementById('tab-image').classList.add('btn-secondary');
+      });
+
+      // File upload handlers
+      const fileInput = document.getElementById('file-input');
+      const uploadArea = document.getElementById('file-upload-area');
+
+      fileInput.addEventListener('change', handleFileSelect);
+
+      // Drag and drop
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+      });
+
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      // Form submission
+      document.getElementById('task-upload-form').addEventListener('submit', handleSubmit);
+    });
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    }
+
+    async function handleFile(file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        showToast('Ungültiger Dateityp. Bitte JPG, PNG oder PDF verwenden.', 'error');
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('Datei zu groß. Maximale Größe: 10MB', 'error');
+        return;
+      }
+
+      currentFile = file;
+
+      // Convert to base64 for storage
+      try {
+        currentFileData = await fileToBase64(file);
+      } catch (error) {
+        showToast('Fehler beim Laden der Datei', 'error');
+        return;
+      }
+
+      // Show preview for images
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('preview-img').src = e.target.result;
+          document.getElementById('preview-img').style.display = 'block';
+          document.getElementById('image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // PDF
+        document.getElementById('preview-img').style.display = 'none';
+        document.getElementById('image-preview').style.display = 'block';
+      }
+    }
+
+    function clearImageUpload() {
+      currentFile = null;
+      currentFileData = null;
+      document.getElementById('file-input').value = '';
+      document.getElementById('image-preview').style.display = 'none';
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      // Validation
+      if (currentMode === 'image' && !currentFile) {
+        showToast('Bitte erst eine Datei hochladen', 'error');
+        return;
+      }
+
+      if (currentMode === 'text') {
+        const text = document.getElementById('text-content').value.trim();
+        if (!text) {
+          showToast('Bitte Aufgabentext eingeben', 'error');
+          return;
+        }
+      }
+
+      // Create task
+      const topic = document.getElementById('topic').value.trim() || 'Allgemein';
+
+      const taskData = {
+        subjectId: 1, // Mathematik
+        topic: topic,
+        taskType: 'math',
+      };
+
+      if (currentMode === 'image') {
+        // Store image data
+        taskData.content = `[Bild-Aufgabe: ${currentFile.name}]`;
+        taskData.imageData = currentFileData;
+        taskData.hasImage = true;
+      } else {
+        // Store text
+        taskData.content = document.getElementById('text-content').value.trim();
+        taskData.hasImage = false;
+      }
+
+      // Save task (without solution - AI will validate later)
+      const task = createTask(taskData);
+
+      showToast('Aufgabe erfolgreich gespeichert!', 'success');
+
+      setTimeout(() => {
+        window.location.href = 'tasks.html';
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

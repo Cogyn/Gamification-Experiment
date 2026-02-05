@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rangliste - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 0.75rem;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .leaderboard-item:hover {
+      transform: translateX(4px);
+      background: var(--bg-tertiary);
+    }
+
+    .leaderboard-rank {
+      font-size: 1.5rem;
+      font-weight: bold;
+      min-width: 3rem;
+      text-align: center;
+    }
+
+    .leaderboard-rank.top-1 {
+      color: #ffd700;
+    }
+
+    .leaderboard-rank.top-2 {
+      color: #c0c0c0;
+    }
+
+    .leaderboard-rank.top-3 {
+      color: #cd7f32;
+    }
+
+    .leaderboard-avatar {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .leaderboard-info {
+      flex: 1;
+    }
+
+    .leaderboard-name {
+      font-weight: bold;
+      font-size: 1.125rem;
+    }
+
+    .leaderboard-stats {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .leaderboard-score {
+      text-align: right;
+    }
+
+    .leaderboard-xp {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .leaderboard-level {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link active">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Rangliste</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Leaderboard Info -->
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-content" style="text-align: center; padding: 3rem;">
+          <div style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
+          <h2 style="font-size: 2rem; margin-bottom: 1rem;">Globale Rangliste</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.125rem;">
+            Die Rangliste zeigt die Top-Performer der EduRank-Community.
+          </p>
+
+          <!-- Leaderboard Display -->
+          <div style="margin-top: 2rem;" id="leaderboard-list">
+            <!-- Leaderboard will be populated -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = getUserData();
+      const tasks = getAllTasks();
+      const solvedTasks = tasks.filter(t => t.status === 'solved');
+
+      // In a real app, this would fetch from a server
+      // For now, only show current user
+      const users = [
+        {
+          name: user.name,
+          level: user.level,
+          xp: user.xp + getXPForCurrentLevel(user.level),
+          tasks: solvedTasks.length,
+          isCurrentUser: true
+        }
+      ];
+
+      const leaderboardEl = document.getElementById('leaderboard-list');
+
+      if (users.length === 0) {
+        leaderboardEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <p style="color: var(--text-secondary);">Noch keine Daten für die Rangliste verfügbar.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let leaderboardHTML = '';
+
+      users.forEach((userData, index) => {
+        const rank = index + 1;
+        const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+
+        leaderboardHTML += `
+          <div class="leaderboard-item" style="${userData.isCurrentUser ? 'border: 2px solid var(--primary);' : ''}">
+            <div class="leaderboard-rank ${rankClass}">
+              ${rank <= 3 ? (rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉') : `#${rank}`}
+            </div>
+            <div class="leaderboard-avatar">
+              ${userData.name.charAt(0).toUpperCase()}
+            </div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">
+                ${userData.name}
+                ${userData.isCurrentUser ? '<span style="color: var(--primary); font-size: 0.875rem;"> (Du)</span>' : ''}
+              </div>
+              <div class="leaderboard-stats">
+                Level ${userData.level} • ${userData.tasks} Aufgaben gelöst
+              </div>
+            </div>
+            <div class="leaderboard-score">
+              <div class="leaderboard-xp">${userData.xp.toLocaleString()}</div>
+              <div class="leaderboard-level">XP</div>
+            </div>
+          </div>
+        `;
+      });
+
+      leaderboardHTML += `
+        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: 0.75rem; text-align: center;">
+          <p style="color: var(--text-secondary);">
+            <i class="fas fa-info-circle"></i>
+            Die globale Rangliste wird mit Backend-Integration erweitert
+          </p>
+        </div>
+      `;
+
+      leaderboardEl.innerHTML = leaderboardHTML;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aufgabe Lösen - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Aufgabe Lösen</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Task Content -->
+      <div class="card" style="max-width: 900px; margin: 0 auto;" id="task-card">
+        <!-- Task will be populated by JS -->
+      </div>
+
+      <!-- Answer Section -->
+      <div class="card" style="max-width: 900px; margin: 2rem auto 0;" id="answer-section">
+        <!-- Answer form will be populated by JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/ai-service.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Get task ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('id');
+
+    if (!taskId) {
+      window.location.href = 'tasks.html';
+    }
+
+    const task = getTaskById(taskId);
+
+    if (!task) {
+      showToast('Aufgabe nicht gefunden', 'error');
+      setTimeout(() => window.location.href = 'tasks.html', 2000);
+    }
+
+    function displayTask() {
+      const taskCard = document.getElementById('task-card');
+      const answerSection = document.getElementById('answer-section');
+
+      // Determine content to display
+      let displayContent = '';
+      if (task.hasImage && task.imageData) {
+        // Show image
+        displayContent = `
+          <div style="text-align: center;">
+            <img src="data:${task.imageData.type};base64,${task.imageData.base64}"
+                 style="max-width: 100%; max-height: 600px; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"
+                 alt="Aufgabenbild">
+          </div>
+        `;
+      } else if (task.latex) {
+        displayContent = task.latex;
+      } else {
+        displayContent = task.formattedContent;
+      }
+
+      // Task Content
+      taskCard.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+              ${getSubjectBadgeHTML(task.subjectId)}
+              ${getStatusBadgeHTML(task.status)}
+              ${task.hasImage ? '<span class="status-badge" style="background-color: #3b82f620; color: #3b82f6;"><i class="fas fa-image"></i> Bild-Aufgabe</span>' : ''}
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+              <span><i class="fas fa-tag"></i> ${task.topic}</span>
+              <span>•</span>
+              ${getDifficultyStars(task.difficulty)}
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">
+              ⭐ ${task.xpReward} XP
+            </div>
+            ${task.attempts > 0 ? `
+              <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                ${task.attempts} Versuch${task.attempts > 1 ? 'e' : ''}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        <div class="card-content">
+          <div id="task-content" style="font-size: 1.125rem; line-height: 1.8;">
+            ${displayContent}
+          </div>
+          ${task.hints && task.hints.length > 0 && task.attempts > 0 ? `
+            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--primary)10; border-left: 4px solid var(--primary); border-radius: 0.5rem;">
+              <strong style="color: var(--primary);"><i class="fas fa-lightbulb"></i> Hinweis:</strong>
+              <p style="margin-top: 0.5rem; color: var(--text-secondary);">${task.hints[Math.min(task.attempts - 1, task.hints.length - 1)]}</p>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Render LaTeX if present (but not for image tasks)
+      if (!task.hasImage) {
+        setTimeout(() => {
+          if (window.renderMathInElement && task.latex) {
+            renderMathInElement(document.getElementById('task-content'), {
+              delimiters: [
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false}
+              ]
+            });
+          }
+        }, 100);
+      }
+
+      // Answer Section
+      if (task.status === 'solved') {
+        answerSection.innerHTML = `
+          <div class="card-content" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 5rem; margin-bottom: 1rem;">✅</div>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--success);">
+              Bereits gelöst!
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+              Diese Aufgabe wurde bereits erfolgreich gelöst am ${formatDate(task.solvedAt)} um ${formatTime(task.solvedAt)}
+            </p>
+            <a href="tasks.html" class="btn btn-primary">
+              <i class="fas fa-list"></i> Zurück zu den Aufgaben
+            </a>
+          </div>
+        `;
+      } else {
+        answerSection.innerHTML = `
+          <div class="card-header">
+            <h2 class="card-title">Deine Antwort</h2>
+          </div>
+          <div class="card-content">
+            <form id="answer-form">
+              <div class="form-group">
+                <label class="form-label" for="answer-input">
+                  <i class="fas fa-pencil-alt"></i> Antwort
+                </label>
+                <textarea
+                  id="answer-input"
+                  class="form-textarea"
+                  placeholder="Gib deine Antwort hier ein..."
+                  rows="4"
+                  required
+                ></textarea>
+                <div id="answer-feedback" style="margin-top: 1rem;"></div>
+              </div>
+
+              <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-success btn-lg" style="flex: 1;">
+                  <i class="fas fa-check"></i> Antwort einreichen
+                </button>
+                <a href="tasks.html" class="btn btn-secondary btn-lg">
+                  <i class="fas fa-arrow-left"></i> Zurück
+                </a>
+              </div>
+            </form>
+          </div>
+        `;
+
+        // Form submission
+        document.getElementById('answer-form').addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          const answer = document.getElementById('answer-input').value.trim();
+          const feedbackEl = document.getElementById('answer-feedback');
+          const submitBtn = document.querySelector('button[type="submit"]');
+
+          if (!answer) {
+            feedbackEl.innerHTML = `
+              <div style="padding: 1rem; background: ${CONFIG.themes.dark.error}20; border-left: 4px solid ${CONFIG.themes.dark.error}; border-radius: 0.5rem; color: ${CONFIG.themes.dark.error};">
+                <strong>Fehler:</strong> Bitte gib eine Antwort ein.
+              </div>
+            `;
+            return;
+          }
+
+          // Show loading state
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Überprüfe Antwort...';
+
+          try {
+            const result = await submitAnswer(taskId, answer, true);
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Antwort einreichen';
+
+            // Check for errors
+            if (!result.success && result.error) {
+              feedbackEl.innerHTML = `
+                <div style="padding: 1rem; background: ${CONFIG.themes.dark.error}20; border-left: 4px solid ${CONFIG.themes.dark.error}; border-radius: 0.5rem; color: ${CONFIG.themes.dark.error};">
+                  <strong>Fehler:</strong> ${result.error}
+                  ${result.error.includes('API-Key') ? `
+                    <div style="margin-top: 1rem;">
+                      <a href="profile.html" class="btn btn-sm btn-primary">
+                        <i class="fas fa-cog"></i> Zu den Einstellungen
+                      </a>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+              return;
+            }
+
+            if (result.correct) {
+            feedbackEl.innerHTML = `
+              <div style="padding: 1.5rem; background: ${CONFIG.themes.dark.success}20; border-left: 4px solid ${CONFIG.themes.dark.success}; border-radius: 0.5rem; color: ${CONFIG.themes.dark.success}; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Richtig!</h3>
+                <p style="margin-bottom: 1rem;">Hervorragend gemacht!</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                  <span style="font-size: 1.25rem;">⭐ +${result.rewards.xp} XP</span>
+                  <span style="font-size: 1.25rem;">🪙 +${result.rewards.coins} Coins</span>
+                  ${result.rewards.streak > 1 ? `<span style="font-size: 1.25rem;">🔥 ${result.rewards.streak} Streak!</span>` : ''}
+                </div>
+              </div>
+            `;
+
+            // Show reward notification
+            showRewardNotification(result.rewards);
+
+            // Update header stats
+            updateHeaderStats();
+
+            // Disable form
+            document.getElementById('answer-input').disabled = true;
+            document.querySelector('button[type="submit"]').disabled = true;
+
+            // Redirect after 3 seconds
+            setTimeout(() => {
+              window.location.href = 'tasks.html';
+            }, 3000);
+          } else {
+              // Display structured feedback
+              let feedbackHTML = '';
+
+              // Check if we have structured feedback
+              if (result.feedback && result.feedback.structured) {
+                const fb = result.feedback;
+
+                // Main feedback box
+                feedbackHTML += `
+                  <div style="padding: 1.5rem; background: ${CONFIG.themes.dark.error}20; border-left: 4px solid ${CONFIG.themes.dark.error}; border-radius: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                      <div style="font-size: 2.5rem;">🤔</div>
+                      <div style="flex: 1;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; color: ${CONFIG.themes.dark.error}; margin-bottom: 0.5rem;">
+                          Noch nicht ganz richtig
+                        </h3>
+                        <p style="color: var(--text-secondary); margin: 0;">
+                          Versuch ${result.attempts} • Zuversicht: ${fb.confidence}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: 0.5rem; margin-bottom: 1rem;">
+                      <strong style="color: var(--text);">Zusammenfassung:</strong>
+                      <p style="margin-top: 0.5rem; color: var(--text-secondary);">${fb.summary}</p>
+                    </div>
+                  </div>
+                `;
+
+                // Error Analysis
+                if (fb.errorAnalysis && fb.errorAnalysis.hasErrors && fb.errorAnalysis.specificErrors.length > 0) {
+                  feedbackHTML += `
+                    <div style="margin-top: 1rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.75rem; border: 1px solid var(--border);">
+                      <h4 style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--accent);">
+                        <i class="fas fa-search"></i> Fehleranalyse
+                      </h4>
+                      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  `;
+
+                  fb.errorAnalysis.specificErrors.forEach(error => {
+                    const severityColors = {
+                      minor: '#f59e0b',
+                      major: '#ef4444',
+                      critical: '#dc2626'
+                    };
+                    const severityIcons = {
+                      minor: 'fa-exclamation-circle',
+                      major: 'fa-exclamation-triangle',
+                      critical: 'fa-times-circle'
+                    };
+
+                    feedbackHTML += `
+                      <div style="padding: 1rem; background: var(--bg-tertiary); border-left: 3px solid ${severityColors[error.severity]}; border-radius: 0.5rem;">
+                        <div style="display: flex; align-items: start; gap: 0.75rem;">
+                          <i class="fas ${severityIcons[error.severity]}" style="color: ${severityColors[error.severity]}; font-size: 1.25rem; margin-top: 0.25rem;"></i>
+                          <div style="flex: 1;">
+                            <strong style="color: var(--text);">${error.location}</strong>
+                            <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.95rem;">${error.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  });
+
+                  feedbackHTML += `
+                      </div>
+                    </div>
+                  `;
+                }
+
+                // Info Boxes
+                if (fb.infoBoxes && fb.infoBoxes.length > 0) {
+                  fb.infoBoxes.forEach(box => {
+                    const boxColors = {
+                      tip: { bg: 'var(--primary)10', border: 'var(--primary)', icon: 'fa-lightbulb', iconColor: 'var(--primary)' },
+                      warning: { bg: 'var(--accent)10', border: 'var(--accent)', icon: 'fa-exclamation-triangle', iconColor: 'var(--accent)' },
+                      concept: { bg: 'var(--success)10', border: 'var(--success)', icon: 'fa-book', iconColor: 'var(--success)' },
+                      formula: { bg: '#6366f110', border: '#6366f1', icon: 'fa-calculator', iconColor: '#6366f1' }
+                    };
+
+                    const style = boxColors[box.type] || boxColors.tip;
+
+                    feedbackHTML += `
+                      <div style="margin-top: 1rem; padding: 1.5rem; background: ${style.bg}; border-left: 4px solid ${style.border}; border-radius: 0.75rem;">
+                        <h4 style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold; margin-bottom: 0.75rem; color: ${style.iconColor};">
+                          <i class="fas ${style.icon}"></i> ${box.title}
+                        </h4>
+                        <p style="color: var(--text-secondary); margin-bottom: ${box.latex ? '1rem' : '0'};">${box.content}</p>
+                        ${box.latex ? `<div class="latex-formula" style="text-align: center; font-size: 1.1rem;">${box.latex}</div>` : ''}
+                      </div>
+                    `;
+                  });
+                }
+
+                // Hints (Progressive)
+                if (fb.hints && fb.hints.length > 0) {
+                  feedbackHTML += `
+                    <div style="margin-top: 1rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.75rem; border: 1px solid var(--primary);">
+                      <h4 style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--primary);">
+                        <i class="fas fa-compass"></i> Hinweise
+                      </h4>
+                      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  `;
+
+                  fb.hints.forEach((hint, idx) => {
+                    const levelColors = {
+                      gentle: '#22c55e',
+                      moderate: '#f59e0b',
+                      strong: '#ef4444'
+                    };
+
+                    feedbackHTML += `
+                      <div style="padding: 1rem; background: var(--bg-tertiary); border-left: 3px solid ${levelColors[hint.level]}; border-radius: 0.5rem;">
+                        <div style="display: flex; align-items: start; gap: 0.75rem;">
+                          <span style="background: ${levelColors[hint.level]}; color: white; width: 1.75rem; height: 1.75rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.875rem;">
+                            ${idx + 1}
+                          </span>
+                          <div style="flex: 1;">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">${hint.targetArea}</div>
+                            <p style="color: var(--text); margin: 0;">${hint.message}</p>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  });
+
+                  feedbackHTML += `
+                      </div>
+                    </div>
+                  `;
+                }
+
+                // Next Steps
+                if (fb.nextSteps && fb.nextSteps.length > 0) {
+                  feedbackHTML += `
+                    <div style="margin-top: 1rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.75rem;">
+                      <h4 style="display: flex; align-items: center; gap: 0.5rem; font-weight: bold; margin-bottom: 1rem;">
+                        <i class="fas fa-route"></i> Nächste Schritte
+                      </h4>
+                      <ol style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                  `;
+
+                  fb.nextSteps.forEach(step => {
+                    feedbackHTML += `<li style="margin-bottom: 0.5rem;">${step}</li>`;
+                  });
+
+                  feedbackHTML += `
+                      </ol>
+                    </div>
+                  `;
+                }
+
+              } else {
+                // Fallback for simple feedback
+                feedbackHTML = `
+                  <div style="padding: 1rem; background: ${CONFIG.themes.dark.error}20; border-left: 4px solid ${CONFIG.themes.dark.error}; border-radius: 0.5rem; color: ${CONFIG.themes.dark.error};">
+                    <strong>Falsch!</strong> ${result.feedback || 'Versuche es nochmal!'}
+                    <div style="margin-top: 0.5rem; font-size: 0.875rem;">
+                      Versuch ${result.attempts}
+                    </div>
+                  </div>
+                `;
+              }
+
+              feedbackEl.innerHTML = feedbackHTML;
+
+              // Render LaTeX in feedback
+              setTimeout(() => {
+                if (window.renderMathInElement) {
+                  renderMathInElement(feedbackEl, {
+                    delimiters: [
+                      {left: '\\[', right: '\\]', display: true},
+                      {left: '\\(', right: '\\)', display: false}
+                    ]
+                  });
+                }
+              }, 100);
+
+              // Clear input for retry
+              document.getElementById('answer-input').value = '';
+              document.getElementById('answer-input').focus();
+            }
+          } catch (error) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Antwort einreichen';
+
+            feedbackEl.innerHTML = `
+              <div style="padding: 1rem; background: ${CONFIG.themes.dark.error}20; border-left: 4px solid ${CONFIG.themes.dark.error}; border-radius: 0.5rem; color: ${CONFIG.themes.dark.error};">
+                <strong>Fehler:</strong> ${error.message || 'Ein Fehler ist aufgetreten.'}
+              </div>
+            `;
+          }
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', displayTask);
+  </script>
+</body>
+</html>

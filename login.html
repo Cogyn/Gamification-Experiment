@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cogyn - Kein Login mehr nötig</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+        .redirect-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 3rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+        }
+        .redirect-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+        }
+        .redirect-info {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+        }
+        .redirect-info p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        .countdown {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-container">
+        <div class="redirect-icon">🎉</div>
+        <h1>Kein Login mehr nötig!</h1>
+        <p>Cogyn verwendet jetzt ein vereinfachtes System ohne Login.</p>
+
+        <div class="redirect-info">
+            <p><strong>✅ Auto-Login aktiviert</strong></p>
+            <p>Du wirst automatisch angemeldet</p>
+            <p><strong>✅ Keine Passwörter</strong></p>
+            <p>Einfach starten und loslegen</p>
+            <p><strong>✅ Daten lokal gespeichert</strong></p>
+            <p>Sicher in deinem Browser</p>
+        </div>
+
+        <a href="index.html" class="btn-primary">
+            🚀 Zur Hauptanwendung
+        </a>
+
+        <div class="countdown">
+            Weiterleitung in <span id="countdown">3</span> Sekunden...
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect nach 3 Sekunden
+        let seconds = 3;
+        const countdownEl = document.getElementById('countdown');
+
+        const interval = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = 'index.html';
+            }
+        }, 1000);
+
+        // Sofortiger Redirect bei Click
+        document.querySelector('.btn-primary').addEventListener('click', (e) => {
+            clearInterval(interval);
+        });
+    </script>
+</body>
+</html>

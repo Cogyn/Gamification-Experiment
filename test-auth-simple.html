@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth System Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            padding: 2rem;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .test-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        h1, h2 {
+            color: var(--primary);
+        }
+        .status {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        .status.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+        .code-block {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 1rem 0;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Auth System Test</h1>
+
+    <div class="test-section">
+        <h2>1. Auth Service Loading</h2>
+        <div id="auth-service-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. User Data</h2>
+        <div id="user-data"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. LocalStorage</h2>
+        <div id="storage-data"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Actions</h2>
+        <button onclick="testUpdateName()">Update Name</button>
+        <button onclick="testShowWelcome()">Show Welcome Dialog</button>
+        <button onclick="testReset()">Reset User</button>
+        <button onclick="location.reload()">Reload Page</button>
+        <div id="action-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Navigation Test</h2>
+        <button onclick="location.href='index.html'">Go to Main App</button>
+        <button onclick="location.href='login.html'">Go to Login Page</button>
+    </div>
+
+    <!-- Load Auth System -->
+    <script src="auth-simple.js"></script>
+
+    <script>
+        console.log('=== Auth Test Page Loaded ===');
+
+        // Test 1: Check if AuthService is loaded
+        function checkAuthService() {
+            const statusDiv = document.getElementById('auth-service-status');
+
+            if (typeof AuthService === 'undefined') {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ AuthService class NOT found!
+                        <div class="code-block">Check if auth-simple.js loaded correctly</div>
+                    </div>
+                `;
+                return false;
+            }
+
+            if (!window.authService) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ window.authService NOT initialized!
+                        <div class="code-block">auth-simple.js should auto-initialize</div>
+                    </div>
+                `;
+                return false;
+            }
+
+            statusDiv.innerHTML = `
+                <div class="status success">
+                    ✅ AuthService loaded and initialized!
+                </div>
+                <div class="code-block">
+AuthService class: ${typeof AuthService}
+window.authService: ${typeof window.authService}
+                </div>
+            `;
+            return true;
+        }
+
+        // Test 2: Check user data
+        function checkUserData() {
+            const userDiv = document.getElementById('user-data');
+
+            if (!window.authService) {
+                userDiv.innerHTML = '<div class="status error">❌ No authService available</div>';
+                return;
+            }
+
+            try {
+                const user = window.authService.getCurrentUser();
+
+                if (!user) {
+                    userDiv.innerHTML = '<div class="status error">❌ No user returned</div>';
+                    return;
+                }
+
+                userDiv.innerHTML = `
+                    <div class="status success">✅ User data loaded!</div>
+                    <div class="code-block">${JSON.stringify(user, null, 2)}</div>
+                `;
+            } catch (error) {
+                userDiv.innerHTML = `
+                    <div class="status error">❌ Error: ${error.message}</div>
+                    <div class="code-block">${error.stack}</div>
+                `;
+            }
+        }
+
+        // Test 3: Check LocalStorage
+        function checkLocalStorage() {
+            const storageDiv = document.getElementById('storage-data');
+
+            const keys = ['cogyn_user', 'edurank_user', 'cogyn_welcome_seen'];
+            let html = '';
+
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                const exists = value !== null;
+
+                html += `
+                    <div style="margin: 0.5rem 0;">
+                        <strong>${key}:</strong>
+                        ${exists ? '✅ Exists' : '❌ Not found'}
+                    </div>
+                `;
+
+                if (exists && value.length < 500) {
+                    html += `<div class="code-block">${value}</div>`;
+                }
+            });
+
+            storageDiv.innerHTML = html;
+        }
+
+        // Test 4: Actions
+        function testUpdateName() {
+            const actionDiv = document.getElementById('action-result');
+
+            try {
+                const newName = prompt('Enter new name:', 'Test User');
+                if (newName) {
+                    window.authService.updateUserName(newName);
+                    actionDiv.innerHTML = `<div class="status success">✅ Name updated to: ${newName}</div>`;
+                    checkUserData();
+                }
+            } catch (error) {
+                actionDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testShowWelcome() {
+            const actionDiv = document.getElementById('action-result');
+
+            try {
+                localStorage.removeItem('cogyn_welcome_seen');
+                window.authService.showWelcomeDialog();
+                actionDiv.innerHTML = `<div class="status success">✅ Welcome dialog triggered</div>`;
+            } catch (error) {
+                actionDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function testReset() {
+            const actionDiv = document.getElementById('action-result');
+
+            if (confirm('Reset user? This will create a new user.')) {
+                try {
+                    window.authService.resetUser();
+                    actionDiv.innerHTML = `<div class="status success">✅ User reset!</div>`;
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } catch (error) {
+                    actionDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+                }
+            }
+        }
+
+        // Run all tests on load
+        window.addEventListener('load', function() {
+            console.log('Running auth tests...');
+
+            setTimeout(() => {
+                checkAuthService();
+                checkUserData();
+                checkLocalStorage();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependencies
+node_modules/
+
+# Sensitive files
+*.env
+*.env.local
+config/aws-config.js
+
+# Backups
+server-download-backup/
+*.bak
+
+# Logs
+*.log

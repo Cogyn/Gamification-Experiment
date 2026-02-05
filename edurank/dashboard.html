@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - EduRank</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-icon">🎓</span>
+        <span>EduRank</span>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link active">
+            <i class="nav-icon fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tasks.html" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+            <span>Aufgaben</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="task-upload.html" class="nav-link">
+            <i class="nav-icon fas fa-upload"></i>
+            <span>Hochladen</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="leaderboard.html" class="nav-link">
+            <i class="nav-icon fas fa-trophy"></i>
+            <span>Rangliste</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="profile.html" class="nav-link">
+            <i class="nav-icon fas fa-user"></i>
+            <span>Profil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" id="logout-btn">
+            <i class="nav-icon fas fa-sign-out-alt"></i>
+            <span>Abmelden</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <div id="header-stats"></div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="grid grid-2">
+        <!-- Stats Overview Card -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h2 class="card-title">Deine Stats</h2>
+          </div>
+          <div class="card-content">
+            <div class="grid grid-3" id="stats-overview">
+              <!-- Stats will be populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Schnellzugriff</h2>
+          </div>
+          <div class="card-content" style="display: flex; flex-direction: column; gap: 1rem;">
+            <a href="task-upload.html" class="btn btn-primary">
+              <i class="fas fa-upload"></i> Neue Aufgabe hochladen
+            </a>
+            <button class="btn btn-secondary" disabled>
+              <i class="fas fa-clock"></i> Time Attack (Coming Soon)
+            </button>
+            <button class="btn btn-secondary" disabled>
+              <i class="fas fa-sword"></i> Ranked Duel (Coming Soon)
+            </button>
+          </div>
+        </div>
+
+        <!-- Subject Mastery -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Fächer-Meisterschaft</h2>
+          </div>
+          <div class="card-content" id="subject-mastery">
+            <!-- Subject mastery will be populated by JS -->
+          </div>
+        </div>
+
+        <!-- Recent Tasks -->
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h2 class="card-title">Neueste Aufgaben</h2>
+            <a href="tasks.html" class="btn btn-sm btn-secondary">Alle anzeigen</a>
+          </div>
+          <div class="card-content">
+            <ul class="task-list" id="recent-tasks">
+              <!-- Recent tasks will be populated by JS -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-menu">
+      <li>
+        <a href="dashboard.html" class="bottom-nav-link active">
+          <i class="bottom-nav-icon fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="tasks.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-list"></i>
+          <span>Aufgaben</span>
+        </a>
+      </li>
+      <li>
+        <a href="task-upload.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-upload"></i>
+          <span>Upload</span>
+        </a>
+      </li>
+      <li>
+        <a href="profile.html" class="bottom-nav-link">
+          <i class="bottom-nav-icon fas fa-user"></i>
+          <span>Profil</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Populate Dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = getUserData();
+
+      // Stats Overview
+      const statsOverview = document.getElementById('stats-overview');
+      const progress = getLevelProgress(user);
+
+      statsOverview.innerHTML = `
+        <div style="text-align: center;">
+          <div class="level-badge">
+            <span class="level-number">${user.level}</span>
+          </div>
+          <div class="xp-bar" style="margin-top: 1rem;">
+            <div class="xp-bar-fill" style="width: ${progress}%"></div>
+          </div>
+          <div class="xp-bar-text">
+            ${user.xp} / ${getXPForNextLevel(user.level) - getXPForCurrentLevel(user.level)} XP
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔥</div>
+          <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">
+            ${user.currentStreak}
+          </div>
+          <div style="color: var(--text-secondary);">Tag Streak</div>
+          <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+            Rekord: ${user.longestStreak} Tage
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🪙</div>
+          <div style="font-size: 2rem; font-weight: bold; color: var(--accent);">
+            ${user.coins}
+          </div>
+          <div style="color: var(--text-secondary);">Brain Coins</div>
+        </div>
+      `;
+
+      // Subject Mastery
+      const subjectMasteryEl = document.getElementById('subject-mastery');
+      const masteryEntries = Object.entries(user.subjectMastery);
+
+      if (masteryEntries.length === 0) {
+        subjectMasteryEl.innerHTML = `
+          <div class="empty-state" style="padding: 2rem 1rem;">
+            <div class="empty-state-icon">📚</div>
+            <p style="color: var(--text-secondary);">Löse Aufgaben, um Fächer-Meisterschaft zu sammeln!</p>
+          </div>
+        `;
+      } else {
+        let masteryHTML = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+
+        masteryEntries.forEach(([slug, data]) => {
+          const subject = CONFIG.subjects.find(s => s.slug === slug);
+          if (subject) {
+            masteryHTML += `
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span>${subject.icon} ${subject.name}</span>
+                  <span style="font-weight: bold; color: ${subject.color};">Level ${data.level}</span>
+                </div>
+                <div class="xp-bar" style="height: 0.5rem;">
+                  <div class="xp-bar-fill" style="width: ${(data.xp / (data.level * 500)) * 100}%; background: ${subject.color};"></div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                  ${data.tasksCompleted} Aufgaben gelöst
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        masteryHTML += '</div>';
+        subjectMasteryEl.innerHTML = masteryHTML;
+      }
+
+      // Recent Tasks
+      const recentTasksEl = document.getElementById('recent-tasks');
+      const recentTasks = getRecentTasks(5);
+
+      if (recentTasks.length === 0) {
+        recentTasksEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <div class="empty-state-text">Noch keine Aufgaben vorhanden</div>
+            <a href="task-upload.html" class="btn btn-primary">
+              <i class="fas fa-upload"></i> Erste Aufgabe erstellen
+            </a>
+          </div>
+        `;
+      } else {
+        let tasksHTML = '';
+
+        recentTasks.forEach(task => {
+          const subject = getSubjectById(task.subjectId);
+          tasksHTML += `
+            <li class="task-item" onclick="window.location.href='task-solve.html?id=${task.id}'">
+              <div class="task-header">
+                <div class="task-meta">
+                  ${getSubjectBadgeHTML(task.subjectId)}
+                  ${getStatusBadgeHTML(task.status)}
+                  ${getDifficultyStars(task.difficulty)}
+                </div>
+              </div>
+              <div class="task-content">${task.rawContent}</div>
+              <div class="task-footer">
+                <span>${formatDate(task.createdAt)}</span>
+                <span>⭐ ${task.xpReward} XP</span>
+              </div>
+            </li>
+          `;
+        });
+
+        recentTasksEl.innerHTML = tasksHTML;
+
+        // Render LaTeX
+        setTimeout(() => {
+          if (window.renderMathInElement) {
+            renderMathInElement(recentTasksEl, {
+              delimiters: [
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false}
+              ]
+            });
+          }
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

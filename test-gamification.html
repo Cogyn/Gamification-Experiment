@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamification Test - Cogyn</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .test-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+        .test-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .test-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .test-btn.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text);
+        }
+        .output-box {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .stat-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat-box {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="color: var(--text); text-align: center; margin-bottom: 2rem;">
+            🎮 Gamification System Test
+        </h1>
+
+        <!-- Current Stats Display -->
+        <div class="test-section">
+            <h2>📊 Aktuelle Stats</h2>
+            <div class="stat-display" id="current-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="display-level">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">XP</div>
+                    <div class="stat-value" id="display-xp">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Coins</div>
+                    <div class="stat-value" id="display-coins">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-value" id="display-streak">-</div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="test-btn secondary" onclick="refreshStats()">🔄 Refresh Stats</button>
+            </div>
+        </div>
+
+        <!-- Task Completion Tests -->
+        <div class="test-section">
+            <h2>✅ Task Completion Tests</h2>
+            <div class="button-group">
+                <button class="test-btn" onclick="testTheoryAnalysis()">📚 Theory Analysis</button>
+                <button class="test-btn" onclick="testErrorAnalysis()">🔍 Error Analysis</button>
+                <button class="test-btn" onclick="testTaskGeneration()">🎲 Task Generation</button>
+            </div>
+            <div class="output-box" id="task-output"></div>
+        </div>
+
+        <!-- Manual XP/Coins Tests -->
+        <div class="test-section">
+            <h2>💰 Manual Rewards</h2>
+            <div class="button-group">
+                <button class="test-btn" onclick="addTestXP(100)">+100 XP</button>
+                <button class="test-btn" onclick="addTestXP(500)">+500 XP</button>
+                <button class="test-btn" onclick="addTestXP(1000)">+1000 XP</button>
+                <button class="test-btn" onclick="addTestCoins(50)">+50 Coins</button>
+                <button class="test-btn" onclick="addTestCoins(100)">+100 Coins</button>
+                <button class="test-btn" onclick="testLevelUp()">🎊 Force Level Up</button>
+            </div>
+            <div class="output-box" id="manual-output"></div>
+        </div>
+
+        <!-- Streak Tests -->
+        <div class="test-section">
+            <h2>🔥 Streak Tests</h2>
+            <div class="button-group">
+                <button class="test-btn" onclick="testStreakUpdate()">Update Streak (Today)</button>
+                <button class="test-btn" onclick="simulateYesterday()">Simulate Yesterday Activity</button>
+                <button class="test-btn" onclick="simulateOldActivity()">Simulate 3 Days Ago (Break Streak)</button>
+            </div>
+            <div class="output-box" id="streak-output"></div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="test-section">
+            <h2>🗄️ Data Management</h2>
+            <div class="button-group">
+                <button class="test-btn secondary" onclick="showLocalStorage()">Show LocalStorage</button>
+                <button class="test-btn secondary" onclick="exportData()">Export Data</button>
+                <button class="test-btn" style="background: var(--error);" onclick="resetAllData()">⚠️ Reset All Data</button>
+            </div>
+            <div class="output-box" id="data-output"></div>
+        </div>
+    </div>
+
+    <!-- Load Gamification Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/edurank-integration.js"></script>
+
+    <script>
+        // Initialize stats display
+        function refreshStats() {
+            const user = getUserData();
+            document.getElementById('display-level').textContent = user.level;
+            document.getElementById('display-xp').textContent = user.xp;
+            document.getElementById('display-coins').textContent = user.coins;
+            document.getElementById('display-streak').textContent = user.currentStreak;
+        }
+
+        // Task Completion Tests
+        function testTheoryAnalysis() {
+            const output = document.getElementById('task-output');
+            output.textContent = 'Testing Theory Analysis...\n';
+
+            const rewards = onTaskCompleted('theory', {
+                topic: 'Quadratische Funktionen',
+                complexity: 4
+            });
+
+            output.textContent += JSON.stringify(rewards, null, 2);
+            refreshStats();
+        }
+
+        function testErrorAnalysis() {
+            const output = document.getElementById('task-output');
+            output.textContent = 'Testing Error Analysis...\n';
+
+            const rewards = onTaskCompleted('error_analysis', {
+                steps: [
+                    { errorType: 'none' },
+                    { errorType: 'logic' },
+                    { errorType: 'calc' },
+                    { errorType: 'none' }
+                ],
+                topic: 'Gleichungen lösen'
+            });
+
+            output.textContent += JSON.stringify(rewards, null, 2);
+            refreshStats();
+        }
+
+        function testTaskGeneration() {
+            const output = document.getElementById('task-output');
+            output.textContent = 'Testing Task Generation...\n';
+
+            const rewards = onTaskCompleted('task_generation', {
+                topic: 'analysis',
+                subtopic: 'differentialrechnung',
+                difficulty: 7
+            });
+
+            output.textContent += JSON.stringify(rewards, null, 2);
+            refreshStats();
+        }
+
+        // Manual Rewards
+        function addTestXP(amount) {
+            const output = document.getElementById('manual-output');
+            output.textContent = `Adding ${amount} XP...\n`;
+
+            const result = addXP(amount);
+            output.textContent += `Level Up: ${result.leveledUp}\n`;
+            output.textContent += `New Level: ${result.newLevel}\n`;
+
+            refreshStats();
+        }
+
+        function addTestCoins(amount) {
+            const output = document.getElementById('manual-output');
+            output.textContent = `Adding ${amount} Coins...\n`;
+
+            addCoins(amount);
+            const user = getUserData();
+            output.textContent += `Total Coins: ${user.coins}\n`;
+
+            refreshStats();
+        }
+
+        function testLevelUp() {
+            const user = getUserData();
+            const nextLevelXP = getXPForNextLevel(user.level);
+            const currentLevelXP = getXPForCurrentLevel(user.level);
+            const xpNeeded = nextLevelXP - currentLevelXP - user.xp;
+
+            addTestXP(xpNeeded + 10);
+        }
+
+        // Streak Tests
+        function testStreakUpdate() {
+            const output = document.getElementById('streak-output');
+            output.textContent = 'Updating streak...\n';
+
+            const streak = updateStreak();
+            output.textContent += `Current Streak: ${streak}\n`;
+
+            const user = getUserData();
+            output.textContent += `Last Activity: ${user.lastActivityDate}\n`;
+            output.textContent += `Longest Streak: ${user.longestStreak}\n`;
+
+            refreshStats();
+        }
+
+        function simulateYesterday() {
+            const output = document.getElementById('streak-output');
+            const user = getUserData();
+
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            user.lastActivityDate = yesterday.toDateString();
+
+            saveUserData(user);
+            output.textContent = `Set last activity to: ${user.lastActivityDate}\n`;
+            output.textContent += 'Now click "Update Streak (Today)" to increment streak.\n';
+        }
+
+        function simulateOldActivity() {
+            const output = document.getElementById('streak-output');
+            const user = getUserData();
+
+            const threeDaysAgo = new Date();
+            threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+            user.lastActivityDate = threeDaysAgo.toDateString();
+
+            saveUserData(user);
+            output.textContent = `Set last activity to: ${user.lastActivityDate}\n`;
+            output.textContent += 'Now click "Update Streak (Today)" to reset streak to 1.\n';
+        }
+
+        // Data Management
+        function showLocalStorage() {
+            const output = document.getElementById('data-output');
+            const user = getUserData();
+            output.textContent = JSON.stringify(user, null, 2);
+        }
+
+        function exportData() {
+            const user = getUserData();
+            const dataStr = JSON.stringify(user, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'cogyn-gamification-backup.json';
+            link.click();
+
+            const output = document.getElementById('data-output');
+            output.textContent = 'Data exported!';
+        }
+
+        function resetAllData() {
+            if (!confirm('⚠️ Dies löscht ALLE Gamification-Daten! Fortfahren?')) return;
+
+            localStorage.removeItem('edurank_user');
+            localStorage.removeItem('edurank_tasks');
+
+            const output = document.getElementById('data-output');
+            output.textContent = 'All data cleared! Refreshing...\n';
+
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            refreshStats();
+            console.log('Gamification Test Page loaded');
+            console.log('User Data:', getUserData());
+        });
+    </script>
+</body>
+</html>
